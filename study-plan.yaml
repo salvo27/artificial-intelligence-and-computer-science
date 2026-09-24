@@ -1,0 +1,230 @@
+# Single source of truth for the courses. scripts/build_index.py uses it to
+# generate the index in README.md, the pages in curricula/ and the folders in courses/.
+# After every change run: python3 scripts/build_index.py
+#
+# Source: official study plan, 2026/27 cohort
+# https://corsi.unical.it/lm/artificial-intelligence-and-computer-science/cds/studiare/
+
+degree:
+  name: Artificial Intelligence and Computer Science
+  class: LM-18
+  code: "0814"
+  cohort: 2026
+  url: https://corsi.unical.it/lm/artificial-intelligence-and-computer-science/
+
+curricula:
+  cos:
+    slug: computer-security
+    name: Computer Security
+    badge: "🔒 COS"
+  das:
+    slug: data-science
+    name: Data Science
+    badge: "📊 DAS"
+
+# Course fields:
+#   slug          folder name in courses/
+#   semester      1 or 2
+#   curricula     [cos], [das], [cos, das]; [] for free-choice courses
+#   modules       optional: each module gets its own subfolder
+#   status        todo | draft | done   (update it when you merge a PR)
+#   contributors  GitHub usernames with the @ (rendered as links) or plain names
+#                 e.g. contributors: ["@mario-rossi", "@jdoe", "Anna Bianchi"]
+courses:
+  # Year 1, semester 1
+  - slug: deep-learning
+    name: Deep Learning
+    code: "27009511"
+    ects: 9
+    year: 1
+    semester: 1
+    curricula: [cos, das]
+    status: todo
+    contributors: []
+
+  - slug: research-and-development-methodologies
+    name: Research and Development Methodologies
+    code: "27008769"
+    ects: 9
+    year: 1
+    semester: 1
+    curricula: [cos, das]
+    status: todo
+    contributors: []
+    modules:
+      - slug: agile-software-development
+        name: Agile Software Development
+        code: "27007802"
+        ects: 6
+      - slug: research-seminars
+        name: Research Seminars in AI&CS
+        ects: 3
+
+  - slug: cryptography
+    name: Cryptography
+    code: "27006172"
+    ects: 6
+    year: 1
+    semester: 1
+    curricula: [cos]
+    status: todo
+    contributors: []
+
+  - slug: secure-software-design
+    name: Secure Software Design
+    code: "27006179"
+    ects: 6
+    year: 1
+    semester: 1
+    curricula: [cos]
+    status: todo
+    contributors: []
+
+  - slug: massively-parallel-programming-on-gpus
+    name: Massively Parallel Programming on GPUs
+    code: "27008773"
+    ects: 6
+    year: 1
+    semester: 1
+    curricula: [das]
+    status: todo
+    contributors: []
+
+  - slug: statistical-methods-for-data-science
+    name: Statistical Methods for Data Science
+    code: "27007794"
+    ects: 6
+    year: 1
+    semester: 1
+    curricula: [das]
+    status: todo
+    contributors: []
+
+  # Year 1, semester 2
+  - slug: intelligent-systems
+    name: Intelligent Systems
+    code: "27006167"
+    ects: 12
+    year: 1
+    semester: 2
+    curricula: [cos, das]
+    status: todo
+    contributors: []
+    modules:
+      - slug: automated-planning
+        name: Automated Planning
+        code: "27009514"
+        ects: 6
+      - slug: intelligent-agents
+        name: Intelligent Agents
+        code: "27009515"
+        ects: 6
+
+  - slug: theoretical-computer-science
+    name: Theoretical Computer Science
+    code: "27006163"
+    ects: 12
+    year: 1
+    semester: 2
+    curricula: [cos, das]
+    status: todo
+    contributors: []
+    modules:
+      - slug: decidability-and-logics
+        name: Decidability and Logics
+        ects: 6
+      - slug: computational-complexity
+        name: Computational Complexity
+        ects: 6
+
+  - slug: network-security
+    name: Network Security
+    code: "27007399"
+    ects: 6
+    year: 1
+    semester: 2
+    curricula: [cos]
+    status: todo
+    contributors: []
+
+  - slug: data-warehouse-and-visualization
+    name: Data Warehouse and Visualization
+    code: "27008772"
+    ects: 6
+    year: 1
+    semester: 2
+    curricula: [das]
+    status: todo
+    contributors: []
+
+  # Year 2, semester 1
+  - slug: algorithmic-game-theory
+    name: Algorithmic Game Theory
+    code: "27008537"
+    ects: 6
+    year: 2
+    semester: 1
+    curricula: [cos, das]
+    status: todo
+    contributors: []
+
+  - slug: neurosymbolic-ai
+    name: Neurosymbolic AI
+    code: "27009516"
+    ects: 6
+    year: 2
+    semester: 1
+    curricula: [cos, das]
+    status: todo
+    contributors: []
+    modules:
+      - slug: foundations-of-neurosymbolic-ai
+        name: Foundations of Neurosymbolic AI
+        ects: 3
+      - slug: llm-lab
+        name: LLM Lab
+        ects: 3
+
+  - slug: cyber-offense-and-defense
+    name: Cyber Offense and Defense
+    code: "27008777"
+    ects: 6
+    year: 2
+    semester: 1
+    curricula: [cos]
+    status: todo
+    contributors: []
+
+  - slug: big-data-analytics
+    name: Big Data Analytics
+    code: "27009519"
+    ects: 6
+    year: 2
+    semester: 1
+    curricula: [das]
+    status: todo
+    contributors: []
+
+  - slug: optimization-for-machine-learning
+    name: Optimization for Machine Learning
+    code: "27007799"
+    ects: 6
+    year: 2
+    semester: 1
+    curricula: [das]
+    status: todo
+    contributors: []
+
+  # Year 2, semester 2
+  - slug: business-game
+    name: Business Game
+    code: "27000275"
+    ects: 6
+    year: 2
+    semester: 2
+    curricula: [cos]
+    status: todo
+    contributors: []
+
+  # Free-choice courses (12 ECTS)
+  # To add one: use `curricula: []`, then run `python3 scripts/build_index.py --scaffold`.

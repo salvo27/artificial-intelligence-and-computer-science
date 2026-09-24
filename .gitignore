@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Python and Jupyter
+__pycache__/
+.venv/
+.ipynb_checkpoints/
+
+# Local material that must not be published (lecturers' slides, PDFs, ...)
+private/
