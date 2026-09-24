@@ -14,8 +14,8 @@
 
 | Module | ECTS | |
 |---|---|---|
-| Automated Planning | 6 | [summary](automated-planning/summary.md) · [notes](automated-planning/notes/) |
-| Intelligent Agents | 6 | [summary](intelligent-agents/summary.md) · [notes](intelligent-agents/notes/) |
+| Automated Planning | 6 | [summary](automated-planning/summary.md) |
+| Intelligent Agents | 6 | [summary](intelligent-agents/summary.md) |
 
 - [Exercises and past exams](exercises/)
 

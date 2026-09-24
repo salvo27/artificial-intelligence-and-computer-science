@@ -4,7 +4,6 @@
 
 ## What's in this PR
 
-- [ ] Lecture notes
 - [ ] Summary
 - [ ] Exercises
 - [ ] Fix to existing material

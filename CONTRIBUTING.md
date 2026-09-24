@@ -4,7 +4,7 @@ Thanks for helping out! Every contribution goes through a pull request (PR).
 
 ## How to open a PR
 
-1. **Fork** the repository and create a branch, for example `deep-learning/lecture-03`.
+1. **Fork** the repository and create a branch, for example `deep-learning/summary-cnn`.
 2. Add or edit files **inside the folder of one course** (`courses/<course>/`).
 3. Open a PR and fill in the template.
 
@@ -19,23 +19,23 @@ the maintainer updates them.**
 
 | What | Where | File name |
 |---|---|---|
-| Notes from one lecture | `courses/<course>/notes/` | `NN-topic.md`, e.g. `03-backpropagation.md` |
 | Course summary | `courses/<course>/summary.md` | already there, fill it in |
 | Exercises and past exams | `courses/<course>/exercises/` | `topic.md` or `YYYY-MM-DD-exam.md` |
 | Images and diagrams | `courses/<course>/assets/` | short descriptive name, e.g. `cnn-architecture.png` |
 | Course info (lecturer, exam, syllabus) | `courses/<course>/README.md` | already there, fill in the _TBD_ fields |
 
-For courses split into modules (e.g. Intelligent Systems), use the module's folder:
-`courses/intelligent-systems/automated-planning/notes/`.
+For courses split into modules (e.g. Intelligent Systems), each module has its own summary:
+`courses/intelligent-systems/automated-planning/summary.md`.
 
 ## How to write
 
-- **Markdown**, one file per lecture. Start from the [lecture template](templates/lecture.md).
-- **English** for everything, so that all students can use the notes.
+- **Markdown**, in the course's `summary.md`. Things said in class that are not in the lecturer's material
+  (an example on the blackboard, a clarification) go in the matching section of the summary.
+- **English** for everything, so that all students can use the material.
 - **Math in LaTeX**, which GitHub renders: `$O(n \log n)$` inline, `$$ ... $$` on its own line.
 - **Diagrams**: Mermaid code blocks (GitHub renders them) or images in `assets/`.
 - **Summaries** should be self-contained: someone who missed the lectures should be able to follow them.
-- **Fixes to someone else's notes are welcome.** Explain what you changed in the PR.
+- **Fixes to someone else's work are welcome.** Explain what you changed in the PR.
 
 ## Course status
 
@@ -44,7 +44,7 @@ Each course in the index has a status. The maintainer sets it, following these r
 | Status | Meaning |
 |---|---|
 | ⬜ To do | Nothing yet, only the empty structure. |
-| 🟡 Draft | Some material exists (notes from some lectures, a partial summary), but it is not enough to prepare the exam. |
+| 🟡 Draft | Some material exists (a partial summary, some exercises), but it is not enough to prepare the exam. |
 | ✅ Done | All of the conditions below are met. |
 
 A course is **done** when:

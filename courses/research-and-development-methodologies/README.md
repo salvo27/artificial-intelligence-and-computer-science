@@ -14,8 +14,8 @@
 
 | Module | ECTS | |
 |---|---|---|
-| Agile Software Development | 6 | [summary](agile-software-development/summary.md) · [notes](agile-software-development/notes/) |
-| Research Seminars in AI&CS | 3 | [summary](research-seminars/summary.md) · [notes](research-seminars/notes/) |
+| Agile Software Development | 6 | [summary](agile-software-development/summary.md) |
+| Research Seminars in AI&CS | 3 | [summary](research-seminars/summary.md) |
 
 - [Exercises and past exams](exercises/)
 

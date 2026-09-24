@@ -14,8 +14,8 @@
 
 | Module | ECTS | |
 |---|---|---|
-| Decidability and Logics | 6 | [summary](decidability-and-logics/summary.md) · [notes](decidability-and-logics/notes/) |
-| Computational Complexity | 6 | [summary](computational-complexity/summary.md) · [notes](computational-complexity/notes/) |
+| Decidability and Logics | 6 | [summary](decidability-and-logics/summary.md) |
+| Computational Complexity | 6 | [summary](computational-complexity/summary.md) |
 
 - [Exercises and past exams](exercises/)
 

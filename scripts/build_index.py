@@ -178,7 +178,7 @@ def scaffold(plan):
     for c in plan["courses"]:
         base = ROOT / "courses" / c["slug"]
         if c["modules"]:
-            rows = ["| {} | {} | [summary]({s}/summary.md) · [notes]({s}/notes/) |".format(
+            rows = ["| {} | {} | [summary]({s}/summary.md) |".format(
                 m["name"], m.get("ects", "n/a"), s=m["slug"]) for m in c["modules"]]
             contents = "\n".join(
                 ["## Modules", "", "| Module | ECTS | |", "|---|---|---|"] + rows +
@@ -188,7 +188,6 @@ def scaffold(plan):
             contents = "\n".join([
                 "## Contents", "",
                 "- [Summary](summary.md)",
-                "- [Lecture notes](notes/)",
                 "- [Exercises and past exams](exercises/)",
             ])
             units = [(base, c["name"], "../../")]
@@ -201,7 +200,6 @@ def scaffold(plan):
             period=period, curricula=curricula, contents=contents))
         for directory, name, root in units:
             write_if_missing(directory / "summary.md", render_template("summary.md", name=name, root=root))
-            keep(directory / "notes")
         keep(base / "exercises")
         keep(base / "assets")
 

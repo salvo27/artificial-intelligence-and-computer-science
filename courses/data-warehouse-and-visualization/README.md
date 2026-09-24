@@ -13,7 +13,6 @@
 ## Contents
 
 - [Summary](summary.md)
-- [Lecture notes](notes/)
 - [Exercises and past exams](exercises/)
 
 ## Syllabus

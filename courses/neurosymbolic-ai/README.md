@@ -14,8 +14,8 @@
 
 | Module | ECTS | |
 |---|---|---|
-| Foundations of Neurosymbolic AI | 3 | [summary](foundations-of-neurosymbolic-ai/summary.md) · [notes](foundations-of-neurosymbolic-ai/notes/) |
-| LLM Lab | 3 | [summary](llm-lab/summary.md) · [notes](llm-lab/notes/) |
+| Foundations of Neurosymbolic AI | 3 | [summary](foundations-of-neurosymbolic-ai/summary.md) |
+| LLM Lab | 3 | [summary](llm-lab/summary.md) |
 
 - [Exercises and past exams](exercises/)
 

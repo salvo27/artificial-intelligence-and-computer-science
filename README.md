@@ -1,6 +1,6 @@
-# Artificial Intelligence and Computer Science: notes and summaries
+# Artificial Intelligence and Computer Science: summaries
 
-Collaborative lecture notes and summaries for the Master's degree in
+Collaborative course summaries and exercises for the Master's degree in
 [Artificial Intelligence and Computer Science](https://corsi.unical.it/lm/artificial-intelligence-and-computer-science/)
 (LM-18) at the University of Calabria.
 
@@ -8,7 +8,7 @@ The degree has two curricula, **Computer Security** and **Data Science**.
 Courses shared by both curricula appear only once.
 
 > [!NOTE]
-> This is an unofficial, student-made project. The notes may contain mistakes:
+> This is an unofficial, student-made project. The summaries may contain mistakes:
 > always check them against the official course material.
 
 ## Course index
@@ -75,18 +75,17 @@ _None yet. Add the ones you attend to `study-plan.yaml` with `curricula: []`._
 │   └── <course>/
 │       ├── README.md        # course info: lecturer, exam format, syllabus, resources
 │       ├── summary.md       # the polished summary, for exam prep
-│       ├── notes/           # lecture notes, one file per lecture (01-intro.md, …)
 │       ├── exercises/       # exercises and past exams
 │       ├── assets/          # images and diagrams
-│       └── <module>/        # courses split into modules: summary.md and notes/ per module
+│       └── <module>/        # courses split into modules: one summary.md per module
 ├── curricula/               # one page per curriculum (generated)
-├── templates/               # templates for lecture notes and new courses
+├── templates/               # templates used by the script for new courses
 └── scripts/build_index.py   # regenerates the indexes from study-plan.yaml
 ```
 
 ## Contributing
 
-Contributions are welcome through pull requests: new notes, summaries, exercises,
+Contributions are welcome through pull requests: new summaries, exercises,
 or fixes to existing material. Read the [contributing guide](CONTRIBUTING.md) first.
 Everyone who contributes to a course is credited in the index above.
 

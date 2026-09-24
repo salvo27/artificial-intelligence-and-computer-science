@@ -13,7 +13,6 @@
 ## Contents
 
 - [Summary](summary.md)
-- [Lecture notes](notes/)
 - [Exercises and past exams](exercises/): [algebra](exercises/algebra.md) (sections 1.1, 1.2 and 1.3)
 
 ## Syllabus
