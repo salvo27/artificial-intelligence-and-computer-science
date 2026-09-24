@@ -17,3 +17,6 @@ __pycache__/
 
 # Local material that must not be published (lecturers' slides, PDFs, ...)
 private/
+
+# Generated PDFs (published by the PDF workflow, not committed)
+build/

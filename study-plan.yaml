@@ -5,6 +5,9 @@
 # Source: official study plan, 2026/27 cohort
 # https://corsi.unical.it/lm/artificial-intelligence-and-computer-science/cds/studiare/
 
+# GitHub repository, used for the PDF download links.
+repository: salvo27/artificial-intelligence-and-computer-science
+
 degree:
   name: Artificial Intelligence and Computer Science
   class: LM-18
@@ -67,7 +70,7 @@ courses:
     year: 1
     semester: 1
     curricula: [cos]
-    status: todo
+    status: draft
     contributors: []
 
   - slug: secure-software-design
@@ -77,7 +80,7 @@ courses:
     year: 1
     semester: 1
     curricula: [cos]
-    status: todo
+    status: draft
     contributors: []
 
   - slug: massively-parallel-programming-on-gpus

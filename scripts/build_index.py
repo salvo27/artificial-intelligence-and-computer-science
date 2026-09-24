@@ -30,6 +30,8 @@ def fail(msg):
 
 def load_plan():
     plan = yaml.safe_load(PLAN.read_text(encoding="utf-8"))
+    if "repository" not in plan:
+        fail("missing 'repository' (owner/name of the GitHub repository)")
     curricula = plan["curricula"]
     seen = set()
     for c in plan["courses"]:
@@ -73,6 +75,13 @@ def status(c):
     return STATUSES[c["status"]]
 
 
+def pdf_link(c, plan):
+    """Link to the PDF published by the PDF workflow; only courses with some material have one."""
+    if c["status"] == "todo":
+        return ""
+    return "[PDF](https://github.com/{}/releases/download/pdf/{}.pdf)".format(plan["repository"], c["slug"])
+
+
 def curriculum_badge(c, plan):
     keys = c["curricula"]
     if not keys:
@@ -99,7 +108,7 @@ def main_index(plan):
     core = [c for c in courses if c["curricula"]]
     electives = [c for c in courses if not c["curricula"]]
     links = " · ".join("[{}](curricula/{}.md)".format(v["name"], v["slug"]) for v in plan["curricula"].values())
-    header = ("Course", "ECTS", "Curriculum", "Status", "Contributors")
+    header = ("Course", "ECTS", "Curriculum", "Status", "PDF", "Contributors")
 
     out = [progress(courses), "", "**Curricula:** " + links, ""]
     for year in sorted({c["year"] for c in core}):
@@ -109,13 +118,14 @@ def main_index(plan):
             group = [c for c in in_year if c["semester"] == sem]
             if not group:
                 continue
-            rows = [(course_link(c, ""), c["ects"], curriculum_badge(c, plan), status(c), contributors(c))
-                    for c in group]
+            rows = [(course_link(c, ""), c["ects"], curriculum_badge(c, plan), status(c), pdf_link(c, plan),
+                     contributors(c)) for c in group]
             out += ["#### Semester {}".format(sem), "", table(header, rows), ""]
 
     out += ["### Free-choice courses", ""]
     if electives:
-        rows = [(course_link(c, ""), c["ects"], ELECTIVE, status(c), contributors(c)) for c in electives]
+        rows = [(course_link(c, ""), c["ects"], ELECTIVE, status(c), pdf_link(c, plan), contributors(c))
+                for c in electives]
         out += [table(header, rows), ""]
     else:
         out += ["_None yet. Add the ones you attend to `study-plan.yaml` with `curricula: []`._", ""]
@@ -126,8 +136,8 @@ def curriculum_page(key, plan):
     cur = plan["curricula"][key]
     courses = sorted((c for c in plan["courses"] if key in c["curricula"]),
                      key=lambda c: (c["year"], c["semester"] or 0))
-    rows = [(c["year"], c["semester"] or "", course_link(c, "../"), c["ects"], status(c), contributors(c))
-            for c in courses]
+    rows = [(c["year"], c["semester"] or "", course_link(c, "../"), c["ects"], status(c), pdf_link(c, plan),
+             contributors(c)) for c in courses]
     return "\n".join([
         GENERATED,
         "",
@@ -139,7 +149,7 @@ def curriculum_page(key, plan):
         "",
         progress(courses),
         "",
-        table(("Year", "Sem.", "Course", "ECTS", "Status", "Contributors"), rows),
+        table(("Year", "Sem.", "Course", "ECTS", "Status", "PDF", "Contributors"), rows),
         "",
     ])
 

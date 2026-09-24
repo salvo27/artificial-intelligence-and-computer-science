@@ -6,16 +6,16 @@ Courses of the **Data Science** curriculum: 84 ECTS, plus 12 ECTS of free-choice
 
 **Progress:** ✅ 0 done · 🟡 0 draft · ⬜ 11 to do, out of 11 courses.
 
-| Year | Sem. | Course | ECTS | Status | Contributors |
-|---|---|---|---|---|---|
-| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | ⬜ To do |  |
-| 1 | 1 | **[Research and Development Methodologies](../courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | ⬜ To do |  |
-| 1 | 1 | **[Massively Parallel Programming on GPUs](../courses/massively-parallel-programming-on-gpus/)** | 6 | ⬜ To do |  |
-| 1 | 1 | **[Statistical Methods for Data Science](../courses/statistical-methods-for-data-science/)** | 6 | ⬜ To do |  |
-| 1 | 2 | **[Intelligent Systems](../courses/intelligent-systems/)**<br><sub>Automated Planning · Intelligent Agents</sub> | 12 | ⬜ To do |  |
-| 1 | 2 | **[Theoretical Computer Science](../courses/theoretical-computer-science/)**<br><sub>Decidability and Logics · Computational Complexity</sub> | 12 | ⬜ To do |  |
-| 1 | 2 | **[Data Warehouse and Visualization](../courses/data-warehouse-and-visualization/)** | 6 | ⬜ To do |  |
-| 2 | 1 | **[Algorithmic Game Theory](../courses/algorithmic-game-theory/)** | 6 | ⬜ To do |  |
-| 2 | 1 | **[Neurosymbolic AI](../courses/neurosymbolic-ai/)**<br><sub>Foundations of Neurosymbolic AI · LLM Lab</sub> | 6 | ⬜ To do |  |
-| 2 | 1 | **[Big Data Analytics](../courses/big-data-analytics/)** | 6 | ⬜ To do |  |
-| 2 | 1 | **[Optimization for Machine Learning](../courses/optimization-for-machine-learning/)** | 6 | ⬜ To do |  |
+| Year | Sem. | Course | ECTS | Status | PDF | Contributors |
+|---|---|---|---|---|---|---|
+| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | ⬜ To do |  |  |
+| 1 | 1 | **[Research and Development Methodologies](../courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | ⬜ To do |  |  |
+| 1 | 1 | **[Massively Parallel Programming on GPUs](../courses/massively-parallel-programming-on-gpus/)** | 6 | ⬜ To do |  |  |
+| 1 | 1 | **[Statistical Methods for Data Science](../courses/statistical-methods-for-data-science/)** | 6 | ⬜ To do |  |  |
+| 1 | 2 | **[Intelligent Systems](../courses/intelligent-systems/)**<br><sub>Automated Planning · Intelligent Agents</sub> | 12 | ⬜ To do |  |  |
+| 1 | 2 | **[Theoretical Computer Science](../courses/theoretical-computer-science/)**<br><sub>Decidability and Logics · Computational Complexity</sub> | 12 | ⬜ To do |  |  |
+| 1 | 2 | **[Data Warehouse and Visualization](../courses/data-warehouse-and-visualization/)** | 6 | ⬜ To do |  |  |
+| 2 | 1 | **[Algorithmic Game Theory](../courses/algorithmic-game-theory/)** | 6 | ⬜ To do |  |  |
+| 2 | 1 | **[Neurosymbolic AI](../courses/neurosymbolic-ai/)**<br><sub>Foundations of Neurosymbolic AI · LLM Lab</sub> | 6 | ⬜ To do |  |  |
+| 2 | 1 | **[Big Data Analytics](../courses/big-data-analytics/)** | 6 | ⬜ To do |  |  |
+| 2 | 1 | **[Optimization for Machine Learning](../courses/optimization-for-machine-learning/)** | 6 | ⬜ To do |  |  |

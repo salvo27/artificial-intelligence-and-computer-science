@@ -1,0 +1,71 @@
+# Builds one PDF per course (summary + exercises) and publishes them as assets
+# of the "pdf" release, so they can be downloaded from the links in the index.
+name: PDF
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "courses/**"
+      - "study-plan.yaml"
+      - "scripts/build_index.py"
+      - "scripts/build_pdfs.py"
+      - "scripts/pdf/**"
+      - ".github/workflows/pdf.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pdf
+  cancel-in-progress: true
+
+env:
+  PANDOC_VERSION: "3.11"
+
+jobs:
+  pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Install pandoc and fonts
+        run: |
+          wget -q "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb"
+          sudo apt-get update -q
+          sudo apt-get install -y -q "./pandoc-${PANDOC_VERSION}-1-amd64.deb" \
+            fonts-noto-core fonts-noto-mono fonts-lmodern fonts-stix
+          # Make the Latin Modern Math font (used for formulas) visible to Chrome.
+          mkdir -p ~/.local/share/fonts
+          find /usr/share/texmf /usr/share/fonts -name 'latinmodern-math.otf' -exec cp {} ~/.local/share/fonts/ \; || true
+          fc-cache -f
+          pandoc --version | head -1
+          google-chrome --version
+
+      - name: Build PDFs
+        run: python3 scripts/build_pdfs.py
+
+      - name: Publish to the "pdf" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(build/pdf/*.pdf)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No course has material yet: nothing to publish."
+            exit 0
+          fi
+          gh release view pdf >/dev/null 2>&1 || gh release create pdf \
+            --title "Course PDFs" \
+            --notes "PDFs of the course summaries and exercises, regenerated automatically on every change to main. Download them from the links in the README." \
+            --target "$GITHUB_SHA" \
+            --latest=false
+          gh release upload pdf "${files[@]}" --clobber

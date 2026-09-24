@@ -70,5 +70,10 @@ After merging a PR:
 2. Run `python3 scripts/build_index.py` (needs `pip install -r scripts/requirements.txt`).
 3. Commit the updated `study-plan.yaml`, `README.md` and `curricula/`.
 
+The PDFs don't need any action: on every push to `main`, the **PDF** workflow rebuilds the PDF of every course
+whose status is not `todo` and publishes it in the [`pdf` release](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/tag/pdf).
+To preview a PDF locally: `python3 scripts/build_pdfs.py <course-slug>` (needs pandoc 3.1.10 or later and Google Chrome);
+the file is written to `build/pdf/`.
+
 To add a free-choice course: add it to `study-plan.yaml` with `curricula: []`,
 then run `python3 scripts/build_index.py --scaffold` to create its folder.

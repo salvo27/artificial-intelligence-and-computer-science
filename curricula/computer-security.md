@@ -4,18 +4,18 @@
 
 Courses of the **Computer Security** curriculum: 84 ECTS, plus 12 ECTS of free-choice courses. Back to the [main index](../README.md).
 
-**Progress:** ✅ 0 done · 🟡 0 draft · ⬜ 11 to do, out of 11 courses.
+**Progress:** ✅ 0 done · 🟡 2 draft · ⬜ 9 to do, out of 11 courses.
 
-| Year | Sem. | Course | ECTS | Status | Contributors |
-|---|---|---|---|---|---|
-| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | ⬜ To do |  |
-| 1 | 1 | **[Research and Development Methodologies](../courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | ⬜ To do |  |
-| 1 | 1 | **[Cryptography](../courses/cryptography/)** | 6 | ⬜ To do |  |
-| 1 | 1 | **[Secure Software Design](../courses/secure-software-design/)** | 6 | ⬜ To do |  |
-| 1 | 2 | **[Intelligent Systems](../courses/intelligent-systems/)**<br><sub>Automated Planning · Intelligent Agents</sub> | 12 | ⬜ To do |  |
-| 1 | 2 | **[Theoretical Computer Science](../courses/theoretical-computer-science/)**<br><sub>Decidability and Logics · Computational Complexity</sub> | 12 | ⬜ To do |  |
-| 1 | 2 | **[Network Security](../courses/network-security/)** | 6 | ⬜ To do |  |
-| 2 | 1 | **[Algorithmic Game Theory](../courses/algorithmic-game-theory/)** | 6 | ⬜ To do |  |
-| 2 | 1 | **[Neurosymbolic AI](../courses/neurosymbolic-ai/)**<br><sub>Foundations of Neurosymbolic AI · LLM Lab</sub> | 6 | ⬜ To do |  |
-| 2 | 1 | **[Cyber Offense and Defense](../courses/cyber-offense-and-defense/)** | 6 | ⬜ To do |  |
-| 2 | 2 | **[Business Game](../courses/business-game/)** | 6 | ⬜ To do |  |
+| Year | Sem. | Course | ECTS | Status | PDF | Contributors |
+|---|---|---|---|---|---|---|
+| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | ⬜ To do |  |  |
+| 1 | 1 | **[Research and Development Methodologies](../courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | ⬜ To do |  |  |
+| 1 | 1 | **[Cryptography](../courses/cryptography/)** | 6 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/cryptography.pdf) |  |
+| 1 | 1 | **[Secure Software Design](../courses/secure-software-design/)** | 6 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/secure-software-design.pdf) |  |
+| 1 | 2 | **[Intelligent Systems](../courses/intelligent-systems/)**<br><sub>Automated Planning · Intelligent Agents</sub> | 12 | ⬜ To do |  |  |
+| 1 | 2 | **[Theoretical Computer Science](../courses/theoretical-computer-science/)**<br><sub>Decidability and Logics · Computational Complexity</sub> | 12 | ⬜ To do |  |  |
+| 1 | 2 | **[Network Security](../courses/network-security/)** | 6 | ⬜ To do |  |  |
+| 2 | 1 | **[Algorithmic Game Theory](../courses/algorithmic-game-theory/)** | 6 | ⬜ To do |  |  |
+| 2 | 1 | **[Neurosymbolic AI](../courses/neurosymbolic-ai/)**<br><sub>Foundations of Neurosymbolic AI · LLM Lab</sub> | 6 | ⬜ To do |  |  |
+| 2 | 1 | **[Cyber Offense and Defense](../courses/cyber-offense-and-defense/)** | 6 | ⬜ To do |  |  |
+| 2 | 2 | **[Business Game](../courses/business-game/)** | 6 | ⬜ To do |  |  |
