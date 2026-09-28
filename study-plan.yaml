@@ -42,7 +42,7 @@ courses:
     year: 1
     semester: 1
     curricula: [cos, das]
-    status: todo
+    status: draft
     contributors: []
 
   - slug: research-and-development-methodologies

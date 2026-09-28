@@ -4,11 +4,11 @@
 
 Courses of the **Computer Security** curriculum: 84 ECTS, plus 12 ECTS of free-choice courses. Back to the [main index](../README.md).
 
-**Progress:** ✅ 0 done · 🟡 2 draft · ⬜ 9 to do, out of 11 courses.
+**Progress:** ✅ 0 done · 🟡 3 draft · ⬜ 8 to do, out of 11 courses.
 
 | Year | Sem. | Course | ECTS | Status | PDF | Contributors |
 |---|---|---|---|---|---|---|
-| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | ⬜ To do |  |  |
+| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning.pdf) |  |
 | 1 | 1 | **[Research and Development Methodologies](../courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | ⬜ To do |  |  |
 | 1 | 1 | **[Cryptography](../courses/cryptography/)** | 6 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/cryptography.pdf) |  |
 | 1 | 1 | **[Secure Software Design](../courses/secure-software-design/)** | 6 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/secure-software-design.pdf) |  |

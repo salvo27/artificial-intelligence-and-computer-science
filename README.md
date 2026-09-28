@@ -19,7 +19,7 @@ The PDFs are regenerated automatically on every change.
 Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Data Science only. See what each [status](CONTRIBUTING.md#course-status) means.
 
 <!-- INDEX:START -->
-**Progress:** ✅ 0 done · 🟡 2 draft · ⬜ 14 to do, out of 16 courses.
+**Progress:** ✅ 0 done · 🟡 3 draft · ⬜ 13 to do, out of 16 courses.
 
 **Curricula:** [Computer Security](curricula/computer-security.md) · [Data Science](curricula/data-science.md)
 
@@ -29,7 +29,7 @@ Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Dat
 
 | Course | ECTS | Curriculum | Status | PDF | Contributors |
 |---|---|---|---|---|---|
-| **[Deep Learning](courses/deep-learning/)** | 9 | 🟢 Common | ⬜ To do |  |  |
+| **[Deep Learning](courses/deep-learning/)** | 9 | 🟢 Common | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning.pdf) |  |
 | **[Research and Development Methodologies](courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | 🟢 Common | ⬜ To do |  |  |
 | **[Cryptography](courses/cryptography/)** | 6 | 🔒 COS | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/cryptography.pdf) |  |
 | **[Secure Software Design](courses/secure-software-design/)** | 6 | 🔒 COS | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/secure-software-design.pdf) |  |

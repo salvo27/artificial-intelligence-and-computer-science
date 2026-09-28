@@ -67,3 +67,7 @@ details { margin: 0.8em 0; padding: 0.4em 1em; border: 1px solid #d0d7de; border
 summary { font-weight: 600; }
 
 .generated { color: #59636e; font-size: 9pt; }
+
+/* Figures: keep them readable without filling the page. */
+img { display: block; margin: 0.8em auto 0.2em; max-width: 70%; max-height: 85mm; object-fit: contain; break-inside: avoid; }
+p > img + em, p > img ~ em { display: block; text-align: center; }

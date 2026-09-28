@@ -58,6 +58,8 @@ A course is **done** when:
 ## What not to upload
 
 - Lecturers' slides, handouts or PDFs, and scans of textbooks. Link to the official page instead.
+  **Single figures** cropped from the slides (a chart, a diagram) are fine when they help explain a point:
+  save them in `assets/` and write *From the slides* under each one. Whole slides are not.
 - Exam papers the lecturer has not made public. Rewrite the exercise in your own words.
 - Personal data of anyone (emails, phone numbers, grades).
 
