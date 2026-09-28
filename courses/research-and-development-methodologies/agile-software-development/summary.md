@@ -131,6 +131,11 @@ we create a unique recipe for a new product.
 
 Scrum takes the benefits of both and cancels their drawbacks, with an adaptive series of **timeboxed iterations called sprints**.
 
+> [!TIP]
+> **Not in the slides: iterative vs incremental with a picture in mind.** A painter working *incrementally* finishes the top-left corner of the canvas perfectly, then the next piece, and so on: you see the whole painting only at the end.
+> Working *iteratively*, they sketch the whole painting roughly, then refine it pass after pass. Scrum does both: each sprint delivers a **new piece** (incremental) that is **complete and usable**, and later sprints can **revise** earlier pieces with feedback (iterative).
+> For a transport product: instead of building wheels, then a chassis, then an engine (useless until the end), deliver a skateboard, then a scooter, then a bike, then a car: every step is usable and teaches you what the user really needs.
+
 ![Iterative and incremental development in sprints](../assets/agile-software-development/iterative-incremental.png)
 *From the slides: each sprint does analysis, design, build, integration and test, then adapts using feedback, producing an increment.*
 
@@ -158,6 +163,12 @@ probing the environment to learn about the "unknown unknowns".
 - **Keep options open.** In plan-driven development, decisions are made, reviewed and approved within each phase, before moving to the next.
   In Scrum, decisions are made at the **last responsible moment (LRM)**: when *not* deciding costs more than deciding.
   "Never make a premature decision just because a generic process would dictate that now is the appointed time to make one."
+
+> [!TIP]
+> **Not in the slides: the last responsible moment in practice.** A team building a web app must choose a database. A plan-driven process decides it in the design phase, before anyone knows the data or the load.
+> In Scrum the team first builds a few features behind a simple storage interface, and chooses the database when the choice starts blocking work (for example when a feature needs complex queries): by then it knows the real access patterns.
+> Deciding later is not procrastinating: the decision is made as soon as waiting would cost more than deciding.
+
 - **Accept that you can't get it right up front.** Requirements change, important knowledge is missing, and trying to write everything up front produces a large quantity of
   low-quality requirements. Scrum produces **just enough** requirements and plans up front, fills in details later, and learns where it was wrong as soon as it delivers.
 - **Favor an adaptive, exploratory approach.** Exploration used to be expensive, so software favored getting it right up front. Today it is cheap:
@@ -193,6 +204,12 @@ probing the environment to learn about the "unknown unknowns".
   "Watch the baton, not the runners."
 - **Consider cost of delay.** The cost of delay is the financial cost of delaying work or a milestone. It lets us compare which waste is worse. For example: should a documenter join
   the team on the first day or at the end?
+
+> [!NOTE]
+> **Not in the slides: cost of delay with numbers.** A feature will earn €20,000 per week once released. The team can release it in 4 weeks if a tester joins now (cost €3,000 per week, often idle at first),
+> or in 6 weeks if the tester joins later. The idle tester costs $4 \times 3{,}000 = €12{,}000$; the 2-week delay costs $2 \times 20{,}000 = €40{,}000$. Paying for the "idle worker" is cheaper than the "idle work":
+> this is why Scrum looks at the cost of delay instead of at everyone being busy.
+
 
 > [!TIP]
 > **Not in the slides: the "thrashing" analogy the slides mention.** When a computer runs too many programs for its memory, it spends most of its time swapping between them and
@@ -345,6 +362,10 @@ the technologies, the organization, and the current impediments.
 - If a significant defect remains on the last day, the item is **not done**: it goes back into the product backlog.
 - The definition can **evolve**: start with a weaker one and strengthen it as organizational impediments are removed.
 
+> [!TIP]
+> **Not in the slides: an example of definition of done** for a web team: code reviewed by a colleague; unit tests written and passing; integrated in the main branch and the build is green; acceptance tests passing;
+> deployed to the staging environment; user documentation updated; no known defects of high priority. An item that meets all its acceptance criteria but is not yet deployed to staging is **not done**.
+
 **Acceptance criteria.** Each backlog item also has its own **conditions of satisfaction**, set by the product owner and checked by **acceptance tests**.
 An item is done only when **both** are met: its acceptance criteria (e.g. "works with all of the credit cards") and the sprint-level definition of done (e.g. "live on the production server").
 The goal is **done-done**: not "I did as much work as I was prepared to do", but "done to the point where the customer would think you are done".
@@ -404,6 +425,11 @@ These are **labels of convenience**, not formal types.
 | **E**stimatable | the team can give them a size, so they can be planned |
 | **S**mall | sized appropriately: a few days, to fit in a sprint |
 | **T**estable | they either pass or fail their tests |
+
+> [!TIP]
+> **Not in the slides: splitting a story that is too big.** "As a customer I want to pay for my order" is too large (card, PayPal, bank transfer, failures, refunds). Split it along the value, not along the technical layers:
+> *"…pay by card"*, *"…pay with PayPal"*, *"…see a clear message when the payment fails"*. Each piece is still valuable, testable and fits in a sprint.
+> Splitting into "database part", "back-end part", "front-end part" would break INVEST: none of those pieces is valuable or testable by itself.
 
 ### Non-functional requirements and knowledge acquisition
 
@@ -901,6 +927,10 @@ coding standards, and a shared metaphor.
 
 **How to read it:** compare the actual line with the line from the starting total to zero on the last day. Below the line, the team is **early**; above it, **late**.
 It can go **up**, when new tasks are discovered or estimates grow (in the example, from day 2 to day 3 the total rises from 180 to 190).
+
+> [!NOTE]
+> **Not in the slides: reading a burndown with numbers.** A 10-day sprint starts with 200 hours of tasks: the ideal line drops 20 hours a day. On day 4 the ideal remaining is $200 - 4 \cdot 20 = 120$; if the chart shows 150,
+> the team is 30 hours (about a day and a half) behind. That is a signal to discuss at the daily scrum: re-plan, swarm on blocked items, or talk with the product owner about the scope, **without** changing the sprint goal.
 
 **Visualize progress with a burnup chart:** the story points of the **completed** items, day by day, against the target. The slides compare a good flow, where items are completed steadily
 from the first days, with a **bad flow**, where nothing is completed for ten days because **too many items were in progress at the same time**, and the target is missed.

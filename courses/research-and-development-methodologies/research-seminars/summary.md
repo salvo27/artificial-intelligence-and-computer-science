@@ -133,6 +133,10 @@ carried out to assess an object, program, practice, activity or system, in order
 
 Both can be used, and a **combination** is often best.
 
+> [!TIP]
+> **Not in the slides: the two kinds of evaluation on one project.** For a new tool that helps students find papers: a *quantitative* evaluation measures, on 50 students, the average time to find 5 relevant papers with and without the tool
+> (numbers, statistics); a *qualitative* evaluation interviews 8 of them about what was confusing or useful (opinions, attitudes). The numbers say *whether* the tool helps, the interviews explain *why*.
+
 ### Bibliometrics
 
 A field that studies publications **quantitatively**: a systematic, statistical approach to evaluate publications, authors, journals and research areas.
@@ -284,6 +288,16 @@ When these suggestions conflict, **use judgment**: there is no canonical structu
   material that is better understood **after** the technical part.
 - **References and acknowledgments:** governed by **truth** (never mislead the reader with unjustified credits) and, within truth, **kindness**.
 
+> [!TIP]
+> **Not in the slides: two examples for the parts above.**
+>
+> *An abstract of about 80 words, high level and self-contained:* "Students often cannot tell whether answers from university chatbots are correct. We present a chatbot that checks every answer against a formal encoding of the
+> regulations and shows the rule it relies on. On 300 real questions, it answers 91% correctly, against 64% of a retrieval-based baseline, and never contradicts the regulations. We also release the encoding of the regulations of
+> our department." No definitions, no citations, no reference to sections: just the problem, the idea, the main result.
+>
+> *Definitional choices:* a paper defines a "short path" as one with at most 10 edges. If 10 could be any reasonable number with the same results, the choice is **arbitrary** (say so, to reassure the reader).
+> If the results also hold for weighted paths, but weights would only complicate the proofs, the choice is **for simplicity**. If the theorems are known to hold only with an unweighted graph, the choice is **essential**, and honesty requires saying it.
+
 ### Benefiting from readers' comments
 
 Friends and close colleagues rarely point out major problems, and they know the work too well to be typical readers.
@@ -413,6 +427,12 @@ probably never will be.
 
 **APA** (7th edition of the American Psychological Association manual) was designed for psychology and is widely used in the social sciences.
 **IEEE** uses numbers in square brackets matching a numbered reference list, and is used in engineering and IT.
+
+> [!NOTE]
+> **Not in the slides: the same reference in the two styles.**
+> *APA:* in the text "(Goldreich, 2004)"; in the list: Goldreich, O. (2004). *How to write a paper*. Weizmann Institute of Science.
+> *IEEE:* in the text "[1]"; in the numbered list: [1] O. Goldreich, "How to write a paper," Weizmann Institute of Science, 2004.
+> With BibTeX you don't write either by hand: the same `.bib` entry is formatted in any style by changing `\bibliographystyle`.
 
 ### Reference managers
 
