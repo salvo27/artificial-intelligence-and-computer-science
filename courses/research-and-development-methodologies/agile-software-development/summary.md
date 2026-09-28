@@ -131,7 +131,7 @@ we create a unique recipe for a new product.
 
 Scrum takes the benefits of both and cancels their drawbacks, with an adaptive series of **timeboxed iterations called sprints**.
 
-![Iterative and incremental development in sprints](../assets/asd-iterative-incremental.png)
+![Iterative and incremental development in sprints](../assets/agile-software-development/iterative-incremental.png)
 *From the slides: each sprint does analysis, design, build, integration and test, then adapts using feedback, producing an increment.*
 
 **All phases are done together.** In Scrum we don't work on one phase at a time but on **one feature at a time**: by the end of a sprint we have a valuable **product increment**,
@@ -226,7 +226,7 @@ Plan-driven development is good in predictable environments, for well-understood
 
 Scrum is not a standardized process with sequential steps: it is a **framework** whose practices are embodied in **roles, activities, artifacts** and their rules.
 
-![The Scrum framework](../assets/asd-scrum-framework.png)
+![The Scrum framework](../assets/agile-software-development/scrum-framework.png)
 *From the slides: from the product backlog (with grooming) through sprint planning, sprint backlog, sprint execution and daily scrum, to the potentially shippable increment, sprint review and retrospective.*
 
 ### Roles
@@ -389,7 +389,7 @@ If all stories were small, we would have to define every requirement in detail l
 | **Task** | what to build, in hours |
 | **Theme** | a collection of related stories |
 
-![Epics, features, sprintable stories and tasks](../assets/asd-story-levels.png)
+![Epics, features, sprintable stories and tasks](../assets/agile-software-development/story-levels.png)
 *From the slides.*
 
 These are **labels of convenience**, not formal types.
@@ -455,7 +455,7 @@ A good backlog is **DEEP**:
 - **Estimated:** items have a size (story points or ideal days); very large items at the bottom may only have a T-shirt size;
 - **Prioritized:** at least the items near the top are ordered.
 
-![A DEEP product backlog](../assets/asd-deep-backlog.png)
+![A DEEP product backlog](../assets/agile-software-development/deep-backlog.png)
 *From the slides: small detailed items on top, large ones below; the top is estimated in points, the bottom only roughly; items are prioritized into releases.*
 
 ### Grooming
@@ -615,7 +615,7 @@ Cunningham used the metaphor to explain why **creating software fast to get feed
 - **Underperformance and universal frustration:** people lower their expectations, work becomes painful, joy disappears, the best developers leave.
 - **Decreased customer satisfaction.**
 
-![Cost of change over time with low and high technical debt](../assets/asd-debt-cost-curve.png)
+![Cost of change over time with low and high technical debt](../assets/agile-software-development/debt-cost-curve.png)
 *From the slides.*
 
 ### Causes
@@ -766,7 +766,7 @@ To plan: create and estimate enough backlog items, and **draw a line** through t
 Items above the first line will be delivered, those between the lines might be, those below won't. Then compare with the **must-have** items: if they are all above the will-have line,
 good news; if they fall between the lines, maybe OK; if some are below the might-have line, bad news.
 
-![Fixed-date release: will have, might have, won't have](../assets/asd-fixed-date-lines.png)
+![Fixed-date release: will have, might have, won't have](../assets/agile-software-development/fixed-date-lines.png)
 *From the slides.*
 
 **Planning a fixed-scope release:**
@@ -790,10 +790,10 @@ good news; if they fall between the lines, maybe OK; if some are below the might
 - **Fixed-date burnup chart:** traditional burndown and burnup charts assume a known total scope, so they don't work for fixed-date releases. Instead, show the narrowing range of scope that can be
   delivered by the date, and how progress compares with the will-have, might-have and must-have lines (the backlog is drawn upside down, so completed work climbs toward the items).
 
-![Fixed-scope burnup chart](../assets/asd-fixed-scope-burnup.png)
+![Fixed-scope burnup chart](../assets/agile-software-development/fixed-scope-burnup.png)
 *From the slides: target 150 points; the actual line is compared with the high, average and low velocity projections.*
 
-![Fixed-date burnup chart](../assets/asd-fixed-date-burnup.png)
+![Fixed-date burnup chart](../assets/agile-software-development/fixed-date-burnup.png)
 *From the slides: the ship date is the end of sprint 6; completed work climbs through the will-have and must-have lines.*
 
 ### Sprint and daily planning
@@ -858,7 +858,7 @@ Each value is (days available − days for Scrum activities) × hours per day: f
 - **Don't start what you can't finish:** limit WIP; unfinished items may mean there is no potentially shippable increment at the end.
 - Use the (predicted) velocity to check the commitment, and gain confidence by **breaking items into tasks** needed to meet the definition of done. This is a form of design and just-in-time planning.
 
-![The sprint backlog used to check the commitment](../assets/asd-sprint-backlog-commitment.png)
+![The sprint backlog used to check the commitment](../assets/agile-software-development/sprint-backlog-commitment.png)
 *From the slides: four items (8 + 5 + 5 + 3 = 21 story points) broken into tasks that add up to 45 + 40 + 37 + 28 = 150 effort-hours.*
 
 > [!NOTE]
@@ -896,7 +896,7 @@ coding standards, and a shared metaphor.
 
 **Keep track of the work to be done** with a **sprint burndown chart**: each day, the estimated effort-hours remaining for the sprint's tasks.
 
-![Sprint burndown chart](../assets/asd-sprint-burndown.png)
+![Sprint burndown chart](../assets/agile-software-development/sprint-burndown.png)
 *From the slides: from 200 hours on day 1 down to 0 on day 15, with the table of remaining hours per task.*
 
 **How to read it:** compare the actual line with the line from the starting total to zero on the last day. Below the line, the team is **early**; above it, **late**.
@@ -905,7 +905,7 @@ It can go **up**, when new tasks are discovered or estimates grow (in the exampl
 **Visualize progress with a burnup chart:** the story points of the **completed** items, day by day, against the target. The slides compare a good flow, where items are completed steadily
 from the first days, with a **bad flow**, where nothing is completed for ten days because **too many items were in progress at the same time**, and the target is missed.
 
-![Sprint burnup chart: good flow vs bad flow](../assets/asd-sprint-burnup.png)
+![Sprint burnup chart: good flow vs bad flow](../assets/agile-software-development/sprint-burnup.png)
 *From the slides.*
 
 ---

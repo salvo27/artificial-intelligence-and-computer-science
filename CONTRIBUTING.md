@@ -21,7 +21,7 @@ the maintainer updates them.**
 |---|---|---|
 | Course summary | `courses/<course>/summary.md` | already there, fill it in |
 | Exercises and past exams | `courses/<course>/exercises/` | `topic.md` or `YYYY-MM-DD-exam.md` |
-| Images and diagrams | `courses/<course>/assets/` | short descriptive name, e.g. `cnn-architecture.png` |
+| Images and diagrams | `courses/<course>/assets/<lesson or module>/` | short descriptive name, e.g. `assets/lesson-04/max-pooling.png` |
 | Course info (lecturer, exam, syllabus) | `courses/<course>/README.md` | already there, fill in the _TBD_ fields |
 
 For courses split into modules (e.g. Intelligent Systems), each module has its own summary:
