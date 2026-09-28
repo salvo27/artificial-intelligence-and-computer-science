@@ -1428,6 +1428,29 @@ $\mathbf{w}^T\mathbf{x}$, which becomes one value of the output, the **feature m
 
 **What is the number of parameters?** Only the weights of the kernel, $3 \times 3 = 9$ (plus a bias), **whatever the size of the image**: the same kernel is used at every position.
 
+> [!NOTE]
+> **Not in the slides: a case study, is it an X?** Black-and-white images with black pixels at $-1$ and white at $+1$. Two images of an X can differ pixel by pixel (shifted, slightly rotated),
+> so comparing them pixel by pixel fails. But they share **local patterns**: a diagonal going one way, a diagonal going the other way, a cross in the middle.
+>
+> ![Two X's: different pixels, same patterns](assets/lesson-04/x-problem.png)
+>
+> Take three $3 \times 3$ filters, one per pattern (diagonal, cross, other diagonal). Sliding the diagonal filter over the image, at the position where the image has exactly that diagonal
+> each of the 9 products is $(+1)(+1)$ or $(-1)(-1) = 1$, so the sum is $9$, the maximum: a **perfect match**. Where the patch looks different, some products are $-1$ and the sum is lower, or negative.
+> The feature map of each filter is a map of **where** its pattern appears: an X is an image where the three maps light up in the right places.
+>
+> ![The three filters of the X](assets/lesson-04/x-filters.png)
+>
+> ![Convolution of a patch with a filter: element-wise product, then sum](assets/lesson-04/x-convolution.png)
+>
+> *From the author's notes in [ai-engineering-labs](https://github.com/salvo27/ai-engineering-labs) (figure from MIT 6.S191).*
+>
+> In a CNN nobody writes these filters: they are **learned** by backpropagation, like all weights. Hand-written filters are what computer vision used before; for example the classic filters below
+> sharpen an image or detect its edges.
+>
+> ![The same photo convolved with different hand-written filters](assets/lesson-04/feature-maps.png)
+>
+> *From the author's notes in [ai-engineering-labs](https://github.com/salvo27/ai-engineering-labs) (figure from MIT 6.S191).*
+
 ### Why CNNs?
 
 Convolution leverages four ideas:
@@ -1468,6 +1491,16 @@ and the output is about half as large in each dimension.
 We can use **several kernels** on the same input, and **each kernel produces its own feature map**. Stacked together, the feature maps form the output volume; its depth is the number of filters.
 Each kernel learns to detect a different feature (for example horizontal edges, vertical edges, textures).
 
+> [!TIP]
+> **Not in the slides: filters layer after layer.** To recognize a cat: a first layer with 32 filters finds simple things (edges in different directions, color contrasts) and outputs a volume of 32 feature maps;
+> a second layer with 64 filters works on that volume and combines edges into curves and corners; a third with 128 filters combines them into eyes, ears, fur. The number of filters usually grows with depth
+> because the possible combinations of simpler features grow quickly. The output of a convolutional layer is a volume $h \times w \times d$, with $d$ the number of filters; each unit is connected
+> only to a small region of the input (its **receptive field**).
+>
+> ![A convolutional layer produces a volume](assets/lesson-04/conv-volume.png)
+>
+> *From the author's notes in [ai-engineering-labs](https://github.com/salvo27/ai-engineering-labs) (figure from MIT 6.S191).*
+
 ![Multiple kernels, each with its own feature map](assets/lesson-04/multiple-filters.png)
 *From the slides.*
 
@@ -1494,6 +1527,10 @@ with $2 \times 2$ windows and stride 2, a $4 \times 4$ feature map becomes $2 \t
 > inside a window doesn't change the output. And, as layers stack, each unit "sees" a larger part of the original image, which is what lets the network build the spatial hierarchy of section 5.1.
 
 **A typical CNN** alternates blocks of CONV + RELU, POOL, and ends with fully connected (FC) layers that produce the class scores.
+
+> [!TIP]
+> **Not in the slides: how big should the pooling window be?** Large windows ($4 \times 4$ or more) shrink the maps fast and make the network light, but throw away the details needed to tell similar shapes apart,
+> like looking at the image through giant tiles. Small windows keep details but shrink slowly, so the network stays large for more layers and overfits more easily. $2 \times 2$ with stride 2 is the usual compromise.
 
 ![A typical CNN: conv, relu, pool, then fully connected](assets/lesson-04/cnn-pipeline.png)
 *From the slides.*
@@ -1820,6 +1857,13 @@ The objective is $x \approx r$, and the loss is $L\big(x, g(f(x))\big)$: how dif
 **Properties.** A trained autoencoder has **learnt and summarized the main characteristics** of the input data; these characteristics represent the data in a **shorter structure**
 (the code), and the statistical properties of the data are summarized in the **latent space** of the network's weights.
 
+> [!TIP]
+> **Not in the slides: an analogy for the latent space.** In Plato's cave, prisoners see only the shadows of objects on a wall, never the objects. The data we observe (pixels, words) are like the shadows:
+> the visible projection of fewer, deeper factors (for a face: pose, expression, lighting). The latent space is where those hidden factors live; the decoder projects them back into "shadows", i.e. data.
+>
+> *And why a plain autoencoder can't generate:* it is **deterministic**, the same input always gives the same code and output, and nothing makes the space between codes meaningful. To generate new data we need
+> a latent space we can **sample** from, which is what the VAE (section 7.3) adds.
+
 > [!NOTE]
 > **Not in the slides: why it doesn't just copy.** If the code is smaller than the input (for example 784 pixels squeezed into 64 numbers, a factor of about 12), the network **cannot** copy
 > the input: it has to keep only what is most useful to rebuild it. For images of clothes, that means shape and type, not the exact value of every pixel. The code becomes a compressed
@@ -1987,6 +2031,14 @@ gradients can flow back to $\mu$ and $\sigma$, and through them to the encoder.
 >
 > *Why $\partial z / \partial \mu = 1$ and $\partial z / \partial \sigma = \varepsilon$:* both are ordinary derivatives of $\mu + \sigma\varepsilon$, so backpropagation works as in section 2.5.
 > With $\mu = 2$, $\sigma = 0.5$ and a drawn $\varepsilon = -1.2$: $z = 2 + 0.5 \cdot (-1.2) = 1.4$.
+
+> [!TIP]
+> **Not in the slides: what a trained VAE lets you do.** Besides generating new samples (decode a $z$ drawn from $\mathcal{N}(0, I)$), the latent space is **interpretable**: changing one latent variable slowly while keeping the others fixed
+> changes one factor of the output smoothly, for example the pose of a face.
+>
+> ![Changing one latent variable changes the head pose](assets/lesson-06/latent-perturbation.png)
+>
+> *From the author's notes in [ai-engineering-labs](https://github.com/salvo27/ai-engineering-labs) (figure from MIT 6.S191).*
 
 ---
 
@@ -2298,6 +2350,14 @@ $$\nabla_{\theta_g} \frac{1}{m}\sum_{i=1}^{m}\log\Big(1 - D\big(G(z^{(i)})\big)\
 > to a $7 \times 7 \times 128$ map with a `Dense` layer, then upsamples it twice with `Conv2DTranspose(strides=2)` (section 8.2) to $28 \times 28$. Two separate Adam optimizers are used, one per network.
 > In this notebook the labels are **1 for fake and 0 for real** (the opposite of the slides, which is fine as long as it's consistent), and a little random noise is added to the labels, a common trick to stabilize training.
 
+> [!TIP]
+> **Not in the slides: a GAN is a distribution transformer.** A trained generator maps Gaussian noise onto the data distribution. Moving in a straight line from one noise vector $z_1$ to another $z_2$ and generating an image at each step
+> gives a smooth transition (below, from a black swan to a robin): the latent space is continuous, as for the VAE.
+>
+> ![Interpolating between two points of the latent space](assets/lesson-09/latent-interpolation.png)
+>
+> *From the author's notes in [ai-engineering-labs](https://github.com/salvo27/ai-engineering-labs) (figure from MIT 6.S191).*
+
 ## 10.3 Conditional GANs and pix2pix
 
 **Conditional GANs:** what if we want to control the nature of the output? We **condition** both networks on a label $c$: the generator receives the noise $z$ **and** $c$, and the discriminator judges
@@ -2361,6 +2421,11 @@ A **recurrent neural network (RNN)** processes a sequence by **iterating over it
 
 An RNN is a **graph with cycles**: perceptrons benefit from **feedback loops**, so the output of a unit at time $t$ is part of its input at time $t + 1$. **Unfolding** the loop in time gives a chain of copies
 of the same unit, one per time step.
+
+> [!TIP]
+> **Not in the slides: why memory is needed** (from the author's notes in ai-engineering-labs). In "Calcio è uno sport violento", the word *calcio* could be the mineral, a kick or the sport: only "sport", which comes later, disambiguates it.
+> And in "My name is Marco, I am 25. What career do you recommend?" the answer depends on information given earlier. A feedforward network treats each input as independent; an RNN keeps a **state**, like a blackboard:
+> at each step it reads the old blackboard $h_{t-1}$, adds the present input $x_t$, and writes a new blackboard $h_t$. The weights stay the same at every step; only the state changes.
 
 ![An RNN and its unfolded version](assets/lesson-10/rnn-unfold.png)
 *From the slides: the cell $A$ receives $x_t$ and produces $h_t$, which is fed back at the next step.*
@@ -2462,6 +2527,11 @@ Assuming $f'(i) = 0.99$ and $T = 300$: $0.99^{300} \approx 0.049$. The gradient 
 > **Not in the slides: how fast it vanishes.** With the sigmoid's maximum derivative $0.25$, ten steps already give $0.25^{10} \approx 0.000001$. Even $0.9^{50} \approx 0.005$.
 > In practice a simple RNN cannot learn dependencies more than a few dozen steps apart: in "The cat, which my neighbor adopted last year after moving from Spain, **was** hungry", the verb must agree with a word far back.
 > (If the factors are larger than 1 the opposite happens: the gradient **explodes**.)
+
+> [!TIP]
+> **Not in the slides: the exploding case and gradient clipping.** The repeated factor also contains the recurrent weight matrix $U$ (going back 3 steps multiplies roughly by $U^3$). If its values are larger than 1 the gradient **explodes**
+> (e.g. $1.1^{300} \approx 2.6 \cdot 10^{12}$) and the weights jump to absurd values. The standard fix is **gradient clipping**: if the norm of the gradient exceeds a threshold, rescale it down to that threshold before the update.
+> Vanishing gradients have no such simple fix, hence gated cells (LSTM, GRU).
 
 **Possible solutions.**
 
@@ -2753,6 +2823,10 @@ We must learn $W$ and $W'$, and either of them (or their average) can be used as
 
 **Intuition:** words with similar contexts (similar words likely to appear around them) should give similar context predictions, and the easiest way for the network to do so is to give them **similar vectors**.
 So words with similar contexts end up with similar embeddings, which is the distributional hypothesis again.
+
+> [!NOTE]
+> **Not in the slides: the training pairs, concretely.** With window size 1, the sentence "the cat sat on floor" gives skip-gram the (central, context) pairs (the, cat), (cat, the), (cat, sat), (sat, cat), (sat, on), (on, sat), (on, floor), (floor, on).
+> Each pair is one training example: the input is the central word, the target the context word. CBOW instead gets one example per position: from {the, sat} predict *cat*, from {cat, on} predict *sat*, and so on.
 
 **An earlier attempt** (Collobert et al., 2011): take sets of 5 words from real sentences ("one of the best places") and corrupt half of them by replacing the middle word ("one of function best places");
 map each word to a 50-dimensional vector with a learned table $W$, and train a module $R$ to tell valid from invalid sequences. Word2Vec's prediction task is simpler and faster.
@@ -3106,6 +3180,17 @@ where $d_k$ is the dimensionality of the keys and values.
 
 **Masked self-attention: "don't look ahead".** In the decoder, a token must not look at **future** tokens, which are unknown at generation time. During training the decoder processes all target tokens at once, so without a mask it would see the future:
 the attention weights towards future positions are set to zero (their scores to $-\infty$ before the softmax).
+
+> [!NOTE]
+> **Not in the slides: self-attention on a sentence** (example from the author's notes in ai-engineering-labs, with corrected percentages). In "The programmer writes code", take the query of *writes* and $d_k = 64$, so $\sqrt{d_k} = 8$.
+> Suppose the dot products with the keys are: *The* 8, *programmer* 56, *writes* 24, *code* 40.
+>
+> 1. **Scale:** $8/8 = 1$, $56/8 = 7$, $24/8 = 3$, $40/8 = 5$. Without scaling, $e^{56}$ would dominate everything and the softmax would be practically one-hot.
+> 2. **Softmax:** $e^1, e^7, e^3, e^5 \approx 2.7, 1096.6, 20.1, 148.4$, total $1267.8$: weights **0.2%** (The), **86.5%** (programmer), **1.6%** (writes), **11.7%** (code).
+> 3. **Weighted sum of the values:** the new vector of *writes* is $0.002\,v_{The} + 0.865\,v_{programmer} + 0.016\,v_{writes} + 0.117\,v_{code}$.
+>
+> The verb now carries information about **who** writes (the subject) and **what** is written (the object), while the article is almost ignored. The real scores are learned, not chosen: the example only shows the mechanics.
+> *Why several heads:* in "She threw the tennis ball to serve", *serve* needs both "tennis" (which sport) and "threw" (which action); one head tends to capture one kind of relation, so several heads run in parallel.
 
 **Multi-head attention.** We need to track many different things at once (who does what, to whom, which word a pronoun refers to…). Several attention **heads** work independently, each with its own $W_Q$, $W_K$, $W_V$; their outputs are concatenated and
 combined linearly.
