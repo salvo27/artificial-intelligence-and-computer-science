@@ -52,7 +52,7 @@ courses:
     year: 1
     semester: 1
     curricula: [cos, das]
-    status: todo
+    status: draft
     contributors: []
     modules:
       - slug: agile-software-development
