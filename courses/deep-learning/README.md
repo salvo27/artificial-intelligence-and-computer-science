@@ -7,13 +7,21 @@
 | **Period** | Year 1, semester 1 |
 | **Curriculum** | Computer Security, Data Science |
 | **Lecturers** | Carlo Adornetto, Gianluigi Greco |
-| **Exam format** | _TBD_ |
+| **Exam format** | Project: design and implement an application that uses neural networks for machine learning tasks; graded in thirtieths (see below) |
 | **Official page** | [Course page on corsi.unical.it](https://corsi.unical.it/lm/artificial-intelligence-and-computer-science/cds/studiare/activities/293075/) |
 
 ## Contents
 
 - [Summary](summary.md)
 - [Exercises and past exams](exercises/): [evaluation metrics](exercises/metrics.md)
+
+## Exam
+
+From the official course page:
+
+- **Method:** an educational **project**. Students must show they can **design a computer application that uses neural networks** in machine learning tasks.
+- **Criteria:** the ability to design and implement systems based on neural networks.
+- **Grade:** the outcome of the project is a mark in thirtieths.
 
 ## Syllabus
 

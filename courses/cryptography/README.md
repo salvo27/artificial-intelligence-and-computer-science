@@ -7,13 +7,21 @@
 | **Period** | Year 1, semester 1 |
 | **Curriculum** | Computer Security |
 | **Lecturer** | J. van Bon |
-| **Exam format** | _TBD_ |
+| **Exam format** | Written test (3 hours) with problems of increasing difficulty, then a discussion of the test; pass mark 18/30 (see below) |
 | **Official page** | _TBD_ |
 
 ## Contents
 
 - [Summary](summary.md)
 - [Exercises and past exams](exercises/): [algebra](exercises/algebra.md) (sections 1.1, 1.2 and 1.3)
+
+## Exam
+
+From the official course page:
+
+- **Method:** two parts: a **written test of 3 hours**, with problems of various degrees of difficulty, and a **discussion of the test** afterwards.
+- **Criteria:** understanding how the algorithms discussed in the course work, and the ability to apply the theory.
+- **Grade:** from 1 to 30, the sum of the marks obtained by solving and discussing the exercises of the written test. The minimum passing grade is 18/30.
 
 ## Syllabus
 
