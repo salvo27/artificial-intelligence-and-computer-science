@@ -1,7 +1,8 @@
 # Algebra: exercises
 
-Exercises on sections 1.1, 1.2 and 1.3 of the notes, with solutions.
+Exercises on sections 1.1 to 1.4 of the notes, with solutions.
 Exercises 1 and 2 are the proofs the notes leave to the reader; the others practice the computations.
+Exercises 11 to 16 (section 1.4) are not in the notes: they follow the examples of the notes on other numbers.
 Try each one before opening the solution.
 
 Back to the [summary](../summary.md).
@@ -220,3 +221,123 @@ By Lemma 1.3.3, $[5]_7^{-1} = p([17]_{21}) = [17]_7 = [3]_7$. Check: $5 \cdot 3 
 $[3]_{21}$ is a zero divisor ($3 \cdot 7 = 21 \equiv 0$), but $p([3]_{21}) = [3]_7$ is invertible, because $\mathbb{Z}/7\mathbb{Z}$ is a field.
 
 </details>
+
+---
+
+### Exercise 11
+
+Compute the order of every element of $(\mathbb{Z}/7\mathbb{Z})^\ast$. Is the group cyclic? Which elements are generators, and how many should there be?
+
+<details>
+<summary>Solution</summary>
+
+The group has order $\varphi(7) = 6$, so the possible orders are $1, 2, 3, 6$ (Lagrange).
+
+- $2$: $2, 4, 8 \equiv 1$, so $o(2) = 3$.
+- $3$: $3, 9 \equiv 2, 6, 18 \equiv 4, 12 \equiv 5, 15 \equiv 1$, so $o(3) = 6$.
+- $4 = 2^2$: $o(4) = \frac{3}{\gcd(3, 2)} = 3$ (Lemma 1.4.5).
+- $5 = 3^5$ (from the list above): $o(5) = \frac{6}{\gcd(6, 5)} = 6$.
+- $6 \equiv -1$: $(-1)^2 = 1$, so $o(6) = 2$.
+- $o(1) = 1$.
+
+There is an element of order 6, so the group is cyclic (Lemma 1.4.8). The generators are $3$ and $5$: exactly $\varphi(6) = 2$, as Lemma 1.4.9 predicts.
+
+</details>
+
+---
+
+### Exercise 12
+
+Show that $[3]$ is a generator of $(\mathbb{Z}/31\mathbb{Z})^\ast$, using Lemma 1.4.16. You may use: $3^{15} \equiv 30$, $3^{10} \equiv 25$, $3^6 \equiv 16 \pmod{31}$.
+
+<details>
+<summary>Solution</summary>
+
+The group has order $\varphi(31) = 30 = 2 \cdot 3 \cdot 5$. The primes dividing 30 are 2, 3, 5, and the exponents to test are $30/2 = 15$, $30/3 = 10$, $30/5 = 6$.
+None of $3^{15}, 3^{10}, 3^6$ is $\equiv 1$, so by Lemma 1.4.16 $o([3]) = 30$: $[3]$ is a generator and the group is cyclic.
+
+Three tests instead of checking the 8 divisors of 30 one by one.
+
+</details>
+
+---
+
+### Exercise 13
+
+Is $(\mathbb{Z}/20\mathbb{Z})^\ast$ cyclic? Answer in two ways: with Theorem 1.4.18, and by computing the largest possible order of an element with Lemma 1.4.14.
+
+<details>
+<summary>Solution</summary>
+
+**With the theorem.** $20 = 4 \cdot 5$ with $4, 5 \ge 3$ and $\gcd(4, 5) = 1$: case 1, so **not cyclic**.
+
+**With orders.** $(\mathbb{Z}/20\mathbb{Z})^\ast \cong (\mathbb{Z}/4\mathbb{Z})^\ast \times (\mathbb{Z}/5\mathbb{Z})^\ast$, of orders 2 and 4. An element of the first factor has order 1 or 2,
+one of the second has order 1, 2 or 4. The order of a pair is the lcm, at most $\mathrm{lcm}(2, 4) = 4$. But the group has order $\varphi(20) = 8$, so no element generates it.
+
+Directly: $(\mathbb{Z}/20\mathbb{Z})^\ast = \lbrace 1, 3, 7, 9, 11, 13, 17, 19 \rbrace$, and $3, 7, 13, 17$ have order 4, while $9, 11, 19$ have order 2.
+
+</details>
+
+---
+
+### Exercise 14
+
+How many elements of each order does $(\mathbb{Z}/21\mathbb{Z})^\ast$ have? Follow the method of the $(\mathbb{Z}/75\mathbb{Z})^\ast$ example.
+
+<details>
+<summary>Solution</summary>
+
+$21 = 3 \cdot 7$, so $(\mathbb{Z}/21\mathbb{Z})^\ast \cong (\mathbb{Z}/3\mathbb{Z})^\ast \times (\mathbb{Z}/7\mathbb{Z})^\ast$, cyclic groups of orders 2 and 6. It has $2 \cdot 6 = 12$ elements.
+
+In a cyclic group there are $\varphi(a)$ elements of order $a$:
+
+- $(\mathbb{Z}/3\mathbb{Z})^\ast$: order 1: 1 element; order 2: 1 element.
+- $(\mathbb{Z}/7\mathbb{Z})^\ast$: order 1: 1; order 2: 1; order 3: $\varphi(3) = 2$; order 6: $\varphi(6) = 2$.
+
+A pair has order equal to the lcm of the orders:
+
+| order | pairs (order in $\mathbb{Z}/3$, order in $\mathbb{Z}/7$) | count |
+|---|---|---|
+| 1 | (1, 1) | $1 \cdot 1 = 1$ |
+| 2 | (2, 1), (1, 2), (2, 2) | $1 + 1 + 1 = 3$ |
+| 3 | (1, 3) | $1 \cdot 2 = 2$ |
+| 6 | (2, 3), (1, 6), (2, 6) | $2 + 2 + 2 = 6$ |
+
+Total $1 + 3 + 2 + 6 = 12$. No element of order 12: not cyclic (again case 1 of Theorem 1.4.18, $21 = 3 \cdot 7$).
+
+</details>
+
+---
+
+### Exercise 15
+
+Compute $3^{100} \bmod 7$ and $2^{1000} \bmod 13$ without a computer.
+
+<details>
+<summary>Solution</summary>
+
+By Fermat, $3^6 \equiv 1 \pmod 7$, so exponents only matter modulo 6 (Corollary 1.4.4). $100 = 6 \cdot 16 + 4$, so $3^{100} \equiv 3^4 = 81 = 11 \cdot 7 + 4 \equiv 4$.
+
+By Fermat, $2^{12} \equiv 1 \pmod{13}$. $1000 = 12 \cdot 83 + 4$, so $2^{1000} \equiv 2^4 = 16 \equiv 3$.
+
+</details>
+
+---
+
+### Exercise 16
+
+Find $[5]^{-1}$ in $(\mathbb{Z}/13\mathbb{Z})^\ast$ and $[7]^{-1}$ in $(\mathbb{Z}/15\mathbb{Z})^\ast$ using Lemma 1.4.11 (3), then check with a multiplication.
+
+<details>
+<summary>Solution</summary>
+
+**Modulo 13**, the group has order 12, so $[5]^{-1} = [5]^{11}$. Since $5^2 = 25 \equiv -1$, we get $5^4 \equiv 1$, so actually $o(5) = 4$ and $5^{11} = 5^{8} \cdot 5^{3} \equiv 5^3 = 5^2 \cdot 5 \equiv -5 \equiv 8$.
+Check: $5 \cdot 8 = 40 = 3 \cdot 13 + 1$.
+
+**Modulo 15**, the group has order $\varphi(15) = 8$, so $[7]^{-1} = [7]^7$. We know $7^2 \equiv 4$ and $7^4 \equiv 1$, so $7^7 = 7^4 \cdot 7^2 \cdot 7 \equiv 4 \cdot 7 = 28 \equiv 13$.
+Check: $7 \cdot 13 = 91 = 6 \cdot 15 + 1$.
+
+Using the order instead of $\lvert G \rvert$ is quicker: $g^{-1} = g^{o(g) - 1}$ too, for example $[7]^{-1} = [7]^3 = [13]$.
+
+</details>
+

@@ -4,7 +4,9 @@ Based on the lecture notes by J. van Bon. The numbering follows the notes, so yo
 compare the two side by side. Every proof follows the same steps as the notes; where a step
 is not obvious, there is an extra explanation or a worked example.
 
-**Progress:** sections 1.1, 1.2 and 1.3 are covered; the rest of the syllabus is still to do.
+**Progress:** sections 1.1 to 1.4 are covered; the rest of the syllabus is still to do.
+
+The notes have almost no pictures. The diagrams marked *Not in the notes* were drawn for this summary, to visualize the examples of the notes.
 
 ## Contents
 
@@ -12,7 +14,7 @@ is not obvious, there is an extra explanation or a worked example.
    - [1.1 Basic notions](#11-basic-notions)
    - [1.2 The ring Z/mZ](#12-the-ring-zmz)
    - [1.3 Direct products and homomorphisms](#13-direct-products-and-homomorphisms)
-   - 1.4 Groups _(to do)_
+   - [1.4 Groups](#14-groups)
    - 1.5 Polynomial rings _(to do)_
    - 1.6 Finite fields _(to do)_
    - 1.7 Linear algebra revisited _(to do)_
@@ -325,6 +327,9 @@ That means $[b]_m = [0]_m$, a contradiction. So $d > 1$ (and $d < m$ because $[a
 and never both (Lemma 1.1.6). So $[a]_m$ is **not** invertible exactly when it is $[0]_m$ (point 1: $d = m$) or a zero divisor
 (point 2: $1 < d < m$), that is, when $d \neq 1$. Hence $[a]_m$ is invertible if and only if $d = 1$. ∎
 
+![Z/12Z as a clock: units, zero divisors and zero](assets/ring-zmz/z12-clock.png)
+*Not in the notes: the 12 classes of $\mathbb{Z}/12\mathbb{Z}$ on a clock, colored by Lemma 1.2.2. The gcd with 12 decides everything.*
+
 **Example: $\mathbb{Z}/5\mathbb{Z}$ and $\mathbb{Z}/12\mathbb{Z}$.**
 
 In $\mathbb{Z}/5\mathbb{Z}$, every $a \in \lbrace 1, 2, 3, 4 \rbrace$ has $\gcd(a, 5) = 1$, so $(\mathbb{Z}/5\mathbb{Z})^\ast = \lbrace 1, 2, 3, 4 \rbrace$
@@ -631,6 +636,10 @@ In words: knowing $a$ modulo $m$ is **the same information** as knowing $a$ modu
 > | $a \bmod 4$ | 0 | 1 | 2 | 3 | 0 | 1 | 2 | 3 | 0 | 1 | 2 | 3 |
 > | $a \bmod 3$ | 0 | 1 | 2 | 0 | 1 | 2 | 0 | 1 | 2 | 0 | 1 | 2 |
 >
+> ![The CRT for 12 as a 4 x 3 grid](assets/direct-products/crt-grid-12.png)
+>
+> *Not in the notes: the same map as a grid, each $a$ placed at $(a \bmod 4, a \bmod 3)$.*
+>
 > All 12 pairs appear exactly once: the map is a bijection. The units $1, 5, 7, 11$ of $\mathbb{Z}/12\mathbb{Z}$ go to
 > $(1, 1), (1, 2), (3, 1), (3, 2)$, exactly the units $a, b, c, d$ of the product found earlier.
 >
@@ -677,6 +686,417 @@ Note that the formula **needs the factorization of $m$**.
 
 ---
 
+## 1.4 Groups
+
+Throughout this section $G$ is a group, its operation is written $\cdot$ and its neutral element, the **identity**, is written $1$.
+
+Up to now we counted the invertible elements modulo $m$. This section studies how they **behave under repeated multiplication**:
+which powers give back 1, and whether a single element generates all the others. These are exactly the questions behind
+Diffie-Hellman, ElGamal and RSA in part 2.
+
+### Order of a group, first examples
+
+**Definition.** The **order** of $G$, written $\lvert G \rvert$, is the number of elements of $G$. The group is **finite** or **infinite** accordingly.
+
+- $(\mathbb{Z}, +, 0)$ is an infinite Abelian group.
+- $(\mathbb{Z}/m\mathbb{Z}, +, 0)$, $m \ge 2$, is a finite Abelian group of order $m$.
+- $((\mathbb{Z}/m\mathbb{Z})^\ast, \cdot, 1)$, $m \ge 2$, is a finite Abelian group of order $\varphi(m)$.
+
+**Automorphism groups.** Let $\Gamma$ be a simple graph and $G$ the set of its automorphisms (the bijections of the vertices that preserve the edges).
+With composition $\circ$ and the identity map, $(G, \circ, id)$ is a group, the **automorphism group** of $\Gamma$.
+
+*Example: the dihedral group.* The automorphism group of an $n$-gon is the **dihedral group** $D_{2n}$, with $2n$ elements.
+For the square ($n = 4$), let $a$ be the reflection in the vertical axis and $b$ the reflection in a diagonal:
+
+![The two reflections a and b of the square](assets/groups/dihedral-reflections.png)
+*From the notes.*
+
+Then $D_8 = \lbrace 1, a, b, ab, ba, aba, bab, abab \rbrace$, with $a^2 = b^2 = (ab)^4 = 1$: four reflections $\lbrace a, b, aba, bab \rbrace$
+and four rotations $\lbrace 1, ab, ba, abab \rbrace$.
+
+> [!TIP]
+> **Not in the notes: why $ab$ is a rotation.** Two reflections applied one after the other keep the orientation of the square (the vertices are still
+> in the same clockwise order), so the result is a rotation. The two axes meet at an angle of 45°, and composing reflections in axes at angle $\theta$ gives a
+> rotation by $2\theta = 90°$. A rotation by 90° must be done 4 times to get back: that is $(ab)^4 = 1$. And $ab \neq ba$ (they are the rotations by
+> $+90°$ and $-90°$), so $D_8$ is **not Abelian**.
+
+**The symmetric group.** The group of all permutations (bijections) of a set $\Omega$ of size $n$, with composition, is the **symmetric group**
+$S_n$ or $\mathrm{Sym}(\Omega)$. It has $n!$ elements. For $n \ge 3$ it is not Abelian: with $\Omega = \lbrace 1, \dots, n \rbrace$, let $a$ swap 1 and 2,
+and $b$ swap 2 and 3 (all other points fixed). Then
+
+$$ba: \ 1 \mapsto 3,\ 2 \mapsto 1,\ 3 \mapsto 2, \qquad ab: \ 1 \mapsto 2,\ 2 \mapsto 3,\ 3 \mapsto 1,$$
+
+so $ab \neq ba$.
+
+> [!NOTE]
+> **Not in the notes: reading $ba$.** As with functions, $ba$ means "first $a$, then $b$": $(ba)(x) = b(a(x))$.
+> Track 1: $a$ sends it to 2, then $b$ sends 2 to 3, so $ba: 1 \mapsto 3$. Track 2: $a$ gives 1, $b$ fixes 1, so $2 \mapsto 1$. Track 3: $a$ fixes it, $b$ gives 2, so $3 \mapsto 2$.
+
+### Powers and the order of an element
+
+**Definition.** For $g \in G$ and $n \in \mathbb{Z}$:
+
+$$g^n = \begin{cases} g \cdot g \cdots g \ (n \text{ times}) & n > 0 \\ 1 & n = 0 \\ g^{-1} \cdot g^{-1} \cdots g^{-1} \ (\lvert n \rvert \text{ times}) & n < 0 \end{cases}$$
+
+The usual rules hold: $g^{-1} \cdot g = g^0 = 1$, $(g^n)^{-1} = (g^{-1})^n = g^{-n}$, $g^n g^m = g^{n+m}$ and $(g^n)^m = g^{nm}$.
+
+> [!TIP]
+> **Not in the notes: additive notation.** In $(\mathbb{Z}/m\mathbb{Z}, +, 0)$ the operation is $+$, so "$g^n$" means $g + g + \dots + g$, that is $n g$.
+> For example in $\mathbb{Z}/12\mathbb{Z}$, "$[5]^3$" is $[15] = [3]$. Keep this in mind in the examples with $\mathbb{Z}/12\mathbb{Z}$ below.
+
+**Definition.** If some positive $n$ gives $g^n = 1$, the smallest such $n$ is the **order** of $g$, written $o(g)$. Otherwise $g$ has **infinite order**.
+
+*Examples.*
+
+- In $(\mathbb{Z}, +, 0)$, the element 1 has infinite order: $1 + 1 + \dots + 1 = n \neq 0$.
+- In $(\mathbb{Z}/12\mathbb{Z})^\ast$, $[5]_{12}$ has order 2: $[5] \neq [1]$ and $[5]^2 = [25] = [1]$.
+- In $(\mathbb{Z}/5\mathbb{Z})^\ast$: $o([1]) = 1$; $o([2]) = 4$ since $2, 4, 8 \equiv 3, 16 \equiv 1$; $o([3]) = 4$ since $3, 9 \equiv 4, 27 \equiv 2, 81 \equiv 1$;
+  $o([4]) = 2$ since $4^2 = 16 \equiv 1$.
+
+**Lemma 1.4.1.** In a finite group every element has finite order, and $o(g) \le \lvert G \rvert$.
+
+*Proof.* Let $\lvert G \rvert = n$ and consider the $n + 1$ elements $g, g^2, \dots, g^n, g^{n+1}$. They all lie in $G$, which has only $n$ elements, so by the
+**pigeonhole principle** two of them coincide: $g^i = g^j$ with $1 \le i < j \le n + 1$. Multiplying by $g^{-i}$ gives $g^{j-i} = 1$, with $1 \le j - i \le n$.
+So some positive power at most $n$ is 1. ∎
+
+**Lemma 1.4.2.** Let $o(g) = n$. Then
+
+1. $1, g, \dots, g^{n-1}$ are distinct;
+2. $o(g) = 1$ if and only if $g = 1$;
+3. $o(g) = 2$ if and only if $g \neq 1$ and $g = g^{-1}$;
+4. $o(g) = o(g^{-1})$.
+
+*Proof.*
+
+1. If $g^i = g^j$ with $0 \le i < j \le n - 1$, then $g^{j-i} = 1$ with $1 \le j - i \le n - 1$, a positive power smaller than $n$: this contradicts $o(g) = n$.
+2. $o(g) = 1$ means $g^1 = 1$.
+3. $o(g) = 2$ means $g^1 \neq 1$ and $g^2 = 1$. Multiplying $g^2 = 1$ by $g^{-1}$ gives $g = g^{-1}$, and conversely.
+4. From $g^n = 1$: $1 = 1^{-1} = (g^n)^{-1} = (g^{-1})^n$, so $o(g^{-1}) \le o(g)$. Now $g^{-1}$ also has finite order, and the same argument applied to it
+   gives $o((g^{-1})^{-1}) \le o(g^{-1})$, that is $o(g) \le o(g^{-1})$. Together, $o(g) = o(g^{-1})$. ∎
+
+*Example.* In $(\mathbb{Z}/5\mathbb{Z})^\ast$ the orders are $1, 4, 4, 2$ for $[1], [2], [3], [4]$. The inverse of $[2]$ must also have order 4 (point 4),
+and it is not $[2]$ itself (point 3: $[2]$ does not have order 2), so it must be $[3]$. Check: $2 \cdot 3 = 6 \equiv 1$.
+
+**Lemma 1.4.3.** Let $g$ have finite order. Then $g^m = 1$ if and only if $o(g) \mid m$.
+
+*Proof.* Let $n = o(g)$. Suppose $g^m = 1$. Divide $m$ by $n$: $m = nq + r$ with $0 \le r < n$. Then
+
+$$1 = g^m = g^{nq + r} = (g^n)^q g^r = 1^q g^r = g^r.$$
+
+Since $r < n$ and $n$ is the *smallest* positive exponent giving 1, $r$ cannot be positive: $r = 0$, so $n \mid m$.
+Conversely, if $m = kn$, then $g^m = (g^n)^k = 1^k = 1$. ∎
+
+**Corollary 1.4.4.** $g^k = g^l$ if and only if $k \equiv l \pmod{o(g)}$.
+
+*Proof.* $g^k = g^l \iff g^{k-l} = 1 \iff o(g) \mid k - l \iff k \equiv l \pmod{o(g)}$. ∎
+
+In words: **exponents of $g$ live in $\mathbb{Z}/o(g)\mathbb{Z}$**. This is the reason why, in RSA, exponents are computed modulo $\varphi(n)$.
+
+*Example: $o([2]_{13})$ in $(\mathbb{Z}/13\mathbb{Z})^\ast$.* We have $2^{12} \equiv 1 \pmod{13}$, so the order divides 12 (Lemma 1.4.3). But $2^6 = 64 \equiv -1$,
+so it does not divide 6, and $2^4 = 16 \equiv 3$, so it does not divide 4. The divisors of 12 that divide neither 6 nor 4 are only 12: $o([2]_{13}) = 12$.
+
+*Example: the orders in $(\mathbb{Z}/12\mathbb{Z}, +, 0)$.* Here $g = [a]_{12}$ and $g^n = [na]_{12}$. So $g^n = 0$ iff $12 \mid na$, iff $\frac{12}{\gcd(a,12)} \mid n \frac{a}{\gcd(a,12)}$,
+iff $\frac{12}{\gcd(a,12)} \mid n$ (the two fractions are coprime). Hence $o([a]_{12}) = \frac{12}{\gcd(a, 12)}$:
+
+| Element | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Order | 1 | 12 | 6 | 4 | 3 | 12 | 2 | 12 | 3 | 4 | 6 | 12 |
+
+*Why "$\frac{12}{d} \mid n\frac{a}{d}$ implies $\frac{12}{d} \mid n$"*: $\frac{12}{d}$ and $\frac{a}{d}$ have no common factor (dividing by the gcd removes all of them),
+so every factor of $\frac{12}{d}$ must be in $n$. It is the same argument as in Lemma 1.2.2.
+
+**Lemma 1.4.5.** Let $g$ have finite order. Then $o(g^m) = \dfrac{o(g)}{\gcd(o(g), m)}$.
+
+*Proof.* Let $n = o(g)$, $k = o(g^m)$, $d = \gcd(n, m)$. First,
+
+$$(g^m)^{n/d} = g^{nm/d} = (g^n)^{m/d} = 1^{m/d} = 1,$$
+
+so by Lemma 1.4.3, $k \mid \frac{n}{d}$. Second, $1 = (g^m)^k = g^{mk}$, so $n \mid mk$; dividing by $d$, $\frac{n}{d} \mid k\frac{m}{d}$. Since $\frac{n}{d}$ and $\frac{m}{d}$ are coprime,
+$\frac{n}{d} \mid k$. Two positive numbers that divide each other are equal: $k = \frac{n}{d}$. ∎
+
+*Example.* In $(\mathbb{Z}/13\mathbb{Z})^\ast$, $[2]$ has order 12, and the group has order 12 too, so the 12 powers $[2]^0, \dots, [2]^{11}$ are all the elements
+(they are distinct by Lemma 1.4.2). The lemma gives every order at once: $o([2]^k) = \frac{12}{\gcd(12, k)}$.
+
+| $k$ | 12 | 1 | 4 | 2 | 9 | 5 | 11 | 3 | 8 | 10 | 7 | 6 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| $[2]^k$ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
+| $o([2]^k)$ | 1 | 12 | 3 | 6 | 4 | 12 | 12 | 4 | 3 | 6 | 12 | 2 |
+
+![The powers of 2 modulo 13 on a cycle, colored by order](assets/groups/powers-of-2-mod-13.png)
+*Not in the notes: the powers of 2 go round all 12 elements before returning to 1. The color is the order, $12/\gcd(12,k)$.*
+
+**Another way: an isomorphism.** The map $f : (\mathbb{Z}/12\mathbb{Z}, +, 0) \to ((\mathbb{Z}/13\mathbb{Z})^\ast, \cdot, 1)$, $[a]_{12} \mapsto [2]_{13}^a$, is well defined
+because $[2]_{13}^{12} = [1]_{13}$ (Corollary 1.4.4: exponents only matter modulo 12). It sends $[0]_{12} \mapsto [1]_{13}$ and
+
+$$f([a]_{12} + [b]_{12}) = [2]_{13}^{a+b} = [2]_{13}^a \cdot [2]_{13}^b = f([a]_{12}) \cdot f([b]_{12}),$$
+
+so it is a homomorphism. It is surjective because $o([2]_{13}) = 12$, and both groups have 12 elements, so it is also injective: an **isomorphism**.
+Compare the table of orders in $\mathbb{Z}/12\mathbb{Z}$ above with this one: $[2]^k$ has the same order as $k$ in $\mathbb{Z}/12\mathbb{Z}$.
+
+> [!NOTE]
+> **Not in the notes: the discrete logarithm.** The isomorphism $f$ turns addition of exponents into multiplication. Going forward is easy
+> ($a \mapsto 2^a \bmod 13$, fast even for huge numbers with square-and-multiply). Going back, "given $y$, find $a$ with $2^a \equiv y$", is the **discrete logarithm**.
+> For groups with hundreds of digits no efficient method is known: this one-way behavior is the basis of Diffie-Hellman and ElGamal (section 2.4).
+
+**Lemma 1.4.6.** Let $\psi : G \to H$ be a homomorphism and $g$ of finite order. Then $o(\psi(g)) \mid o(g)$; if $\psi$ is an isomorphism, $o(\psi(g)) = o(g)$.
+
+*Proof.* Let $n = o(g)$. Then $1 = \psi(1) = \psi(g^n) = \psi(g)^n$, so $\psi(g)$ has finite order dividing $n$ (Lemma 1.4.3). If $\psi$ is an isomorphism,
+apply the same argument to $\psi^{-1}$ (a homomorphism by Lemma 1.3.4) and $h = \psi(g)$: $o(g) = o(\psi^{-1}(h)) \mid o(h) = o(\psi(g))$.
+Each divides the other, so they are equal. ∎
+
+### Subgroups and cyclic groups
+
+**Definition.** A subset $H \subseteq G$ is a **subgroup** if $(H, \cdot)$ is a group with the restricted operation.
+
+**Lemma 1.4.7.** $H$ is a subgroup of $G$ if and only if
+
+1. $h_1, h_2 \in H \Rightarrow h_1 h_2 \in H$;
+2. $1 \in H$;
+3. $h \in H \Rightarrow h^{-1} \in H$.
+
+*Proof.* If $H$ is a subgroup, (1) and (3) clearly hold. For (2): $H$ has a neutral element $e$; for any $h \in H$, $e \cdot h = h = 1 \cdot h$, and by the
+cancellation law in $G$, $e = 1$. So $1 \in H$. Conversely, (1) makes $(H, \cdot)$ a semigroup (associativity is inherited from $G$), (2) makes it a monoid,
+and (3) a group. ∎
+
+**Definition.** The **subgroup generated by $g$** is $\langle g \rangle = \lbrace g^k : k \in \mathbb{Z} \rbrace$.
+
+It is a subgroup: $g^k g^l = g^{k+l}$, $1 = g^0$, $(g^k)^{-1} = g^{-k}$. If $o(g) = n$, then $g^i = g^{n+i}$, so $\langle g \rangle = \lbrace 1, g, \dots, g^{n-1} \rbrace$,
+a group of order $n$. So **$o(g) = \lvert \langle g \rangle \rvert$**.
+
+*Example.* In $(\mathbb{Z}/13\mathbb{Z})^\ast$: $\langle [2] \rangle$ is the whole group; $\langle [4] \rangle = \lbrace 1, 4, 3, 12, 9, 10 \rbrace$ has order 6;
+$\langle [8] \rangle = \lbrace 1, 8, 12, 5 \rbrace$ has order 4.
+
+![The subgroups of (Z/13Z)*, one for each divisor of 12](assets/groups/subgroups-of-z13.png)
+*Not in the notes: all the subgroups of $(\mathbb{Z}/13\mathbb{Z})^\ast$. A line means that the upper subgroup contains the lower one.*
+
+**Definition.** $g$ is a **generator** of $G$ if $\langle g \rangle = G$. A group with a generator is **cyclic**.
+
+**Lemma 1.4.8.** A finite group $G$ is cyclic if and only if it has an element of order $\lvert G \rvert$.
+
+*Proof.* $o(g) = \lvert \langle g \rangle \rvert$, and $\langle g \rangle \subseteq G$. So $\langle g \rangle = G$ exactly when $o(g) = \lvert G \rvert$. ∎
+
+*Examples.*
+
+- $(\mathbb{Z}, +, 0)$ is cyclic, with generators 1 and $-1$.
+- $(\mathbb{Z}/m\mathbb{Z}, +, 0)$ is cyclic of order $m$; its generators are the $[a]_m$ with $\gcd(a, m) = 1$, because $[a]_m = [1]_m^a$ has order $\frac{m}{\gcd(m, a)}$ (Lemma 1.4.5).
+- $(\mathbb{Z}/13\mathbb{Z})^\ast$ is cyclic; its generators are the 4 elements of order 12.
+- $(\mathbb{Z}/5\mathbb{Z})^\ast$ is cyclic of order 4; its generators are the 2 elements of order 4, $[2]$ and $[3]$.
+- $(\mathbb{Z}/12\mathbb{Z})^\ast$ is **not** cyclic: it has order $\varphi(12) = 4$, but all its elements have order 1 or 2.
+
+**Lemma 1.4.9.** A finite cyclic group $G$ has exactly $\varphi(\lvert G \rvert)$ generators.
+
+*Proof.* Let $g$ be a generator, so $G = \lbrace g^k : 1 \le k \le \lvert G \rvert \rbrace$. The element $g^k$ is a generator iff $o(g^k) = \lvert G \rvert$. By Lemma 1.4.5,
+$o(g^k) = \frac{\lvert G \rvert}{\gcd(k, \lvert G \rvert)}$, which equals $\lvert G \rvert$ iff $\gcd(k, \lvert G \rvert) = 1$. The number of such $k$ in $\lbrace 1, \dots, \lvert G \rvert \rbrace$
+is $\varphi(\lvert G \rvert)$ by definition. ∎
+
+*Example.* $(\mathbb{Z}/13\mathbb{Z})^\ast$ has $\varphi(12) = 4$ generators: $[2]^k$ with $k \in \lbrace 1, 5, 7, 11 \rbrace$, that is $[2], [6], [11], [7]$.
+
+### Lagrange's theorem
+
+**Theorem 1.4.10 (Lagrange).** If $G$ is finite and $H$ is a subgroup of $G$, then $\lvert H \rvert$ divides $\lvert G \rvert$.
+
+*Proof.* Define on $G$ the relation $a \sim b$ if $ab^{-1} \in H$.
+
+**It is an equivalence relation.** Reflexive: $aa^{-1} = 1 \in H$. Symmetric: if $ab^{-1} \in H$, then its inverse $ba^{-1} = (ab^{-1})^{-1} \in H$.
+Transitive: if $ab^{-1} \in H$ and $bc^{-1} \in H$, then their product $ab^{-1}bc^{-1} = ac^{-1} \in H$. (Each step uses one property of Lemma 1.4.7.)
+
+**The class of $a$ is $[a] = \lbrace ha : h \in H \rbrace$.** If $g = ha$, then $ag^{-1} = a a^{-1} h^{-1} = h^{-1} \in H$, so $g \in [a]$.
+If $g \in [a]$, then $ag^{-1} = h$ for some $h \in H$, so $g = h^{-1}a$, which has the form $h'a$.
+
+**Every class has $\lvert H \rvert$ elements**, because $h_1 a = h_2 a$ implies $h_1 = h_2$ (cancel $a$). The classes form a partition of $G$; if there are $X$ of them,
+$\lvert H \rvert \cdot X = \lvert G \rvert$. So $\lvert H \rvert$ divides $\lvert G \rvert$. ∎
+
+The number $\frac{\lvert G \rvert}{\lvert H \rvert}$ is the **index** of $H$ in $G$.
+
+![The four classes of H = {1, 3, 9} in (Z/13Z)*](assets/groups/lagrange-cosets-z13.png)
+*Not in the notes: for $H = \langle [3] \rangle$, the classes $Ha$ are 4 disjoint sets of 3 elements each, covering the whole group. The index is 4.*
+
+**Lemma 1.4.11.** Let $G$ be finite and $g \in G$. Then
+
+1. $o(g)$ divides $\lvert G \rvert$;
+2. $g^{\lvert G \rvert} = 1$;
+3. $g^{-1} = g^{\lvert G \rvert - 1}$.
+
+*Proof.* $o(g) = \lvert \langle g \rangle \rvert$ and $\langle g \rangle$ is a subgroup, so (1) is Lagrange. Then (2) follows from Lemma 1.4.3, and multiplying (2) by $g^{-1}$ gives (3). ∎
+
+> [!TIP]
+> **Not in the notes: point 3 as an algorithm.** It gives inverses without the extended Euclidean algorithm. In $(\mathbb{Z}/13\mathbb{Z})^\ast$:
+> $[5]^{-1} = [5]^{11}$. Squaring: $5^2 = 25 \equiv 12 \equiv -1$, so $5^4 \equiv 1$, and $5^{11} = 5^{8} \cdot 5^{2} \cdot 5 \equiv 1 \cdot (-1) \cdot 5 = -5 \equiv 8$.
+> Check: $5 \cdot 8 = 40 = 3 \cdot 13 + 1$.
+
+*Example.* In $(\mathbb{Z}/13\mathbb{Z})^\ast$ (order 12) the possible orders are $1, 2, 3, 4, 6, 12$. In $(\mathbb{Z}/12\mathbb{Z})^\ast$ and $(\mathbb{Z}/5\mathbb{Z})^\ast$ (order 4)
+they are $1, 2, 4$. But in $(\mathbb{Z}/12\mathbb{Z})^\ast$ nothing has order 4: **the converse of Lagrange is false**, a divisor of $\lvert G \rvert$ need not be the order of an element.
+
+**Theorem 1.4.12 (Euler).** If $m \ge 2$ and $\gcd(a, m) = 1$, then $a^{\varphi(m)} \equiv 1 \pmod m$.
+
+*Proof.* $[a]_m$ is invertible, so it lies in $(\mathbb{Z}/m\mathbb{Z})^\ast$, a group of order $\varphi(m)$. By Lemma 1.4.11 (2), $[a]_m^{\varphi(m)} = [1]_m$. ∎
+
+**Theorem 1.4.13 (Fermat).** If $p$ is prime and $p \nmid a$, then $a^{p-1} \equiv 1 \pmod p$.
+
+*Proof.* $p \nmid a$ is the same as $\gcd(a, p) = 1$, and $\varphi(p) = p - 1$. Apply Euler. ∎
+
+> [!NOTE]
+> **Not in the notes: using Fermat to reduce exponents.** $3^{100} \bmod 7$: since $3^6 \equiv 1$ and $100 = 6 \cdot 16 + 4$,
+> $3^{100} = (3^6)^{16} \cdot 3^4 \equiv 3^4 = 81 \equiv 4 \pmod 7$. And the step that makes RSA work: if $ed \equiv 1 \pmod{\varphi(n)}$, then
+> $(x^e)^d = x^{1 + k\varphi(n)} = x \cdot (x^{\varphi(n)})^k \equiv x \pmod n$ for $x$ coprime to $n$ (section 2.3).
+
+### Orders in products
+
+*Example: $(\mathbb{Z}/15\mathbb{Z})^\ast$ by hand.* $\varphi(15) = \varphi(3)\varphi(5) = 8$, and $(\mathbb{Z}/15\mathbb{Z})^\ast = \lbrace 1, 2, 4, 7, 8, 11, 13, 14 \rbrace$.
+A non-identity element has order 2, 4 or 8.
+
+- $2^2 = 4 \neq 1$, $2^4 = 16 \equiv 1$: $o(2) = 4$. Hence (Lemma 1.4.5) $o(4) = o(2^2) = 2$ and $o(8) = o(2^3) = 4$.
+- $7^2 = 49 \equiv 4$, $7^4 \equiv 4^2 \equiv 1$: $o(7) = 4$. Hence $o(13) = o(7^3) = 4$ (since $7^3 = 343 = 22 \cdot 15 + 13$).
+- $11^2 = (-4)^2 = 16 \equiv 1$: $o(11) = 2$. $14^2 = (-1)^2 = 1$: $o(14) = 2$.
+
+No element has order 8, so $(\mathbb{Z}/15\mathbb{Z})^\ast$ is **not cyclic**.
+
+**Lemma 1.4.14.** For finite groups $G, H$ and $(g, h) \in G \times H$: $o((g, h)) = \mathrm{lcm}(o(g), o(h))$.
+
+*Proof.* Let $n = o((g, h))$. Then $(g^n, h^n) = (1, 1)$, so $o(g) \mid n$ and $o(h) \mid n$, hence $\mathrm{lcm}(o(g), o(h)) \mid n$. On the other hand, with $L = \mathrm{lcm}(o(g), o(h))$,
+both $o(g)$ and $o(h)$ divide $L$, so $(g, h)^L = (g^L, h^L) = (1, 1)$ and $n \mid L$. So $n = L$. ∎
+
+*The same example with the lemma.* $\mathbb{Z}/15\mathbb{Z} \cong \mathbb{Z}/3\mathbb{Z} \times \mathbb{Z}/5\mathbb{Z}$ (CRT), so $(\mathbb{Z}/15\mathbb{Z})^\ast \cong (\mathbb{Z}/3\mathbb{Z})^\ast \times (\mathbb{Z}/5\mathbb{Z})^\ast$
+(Lemma 1.3.8). In $(\mathbb{Z}/3\mathbb{Z})^\ast = \lbrace 1, 2 \rbrace$, $o(2) = 2$. In $(\mathbb{Z}/5\mathbb{Z})^\ast$, $o(2) = o(3) = 4$ and $o(4) = 2$. The order of a pair is the lcm:
+
+| $(\mathbb{Z}/3)^\ast \times (\mathbb{Z}/5)^\ast$ | (1,1) | (1,2) | (1,3) | (1,4) | (2,1) | (2,2) | (2,3) | (2,4) |
+|---|---|---|---|---|---|---|---|---|
+| Order | 1 | 4 | 4 | 2 | 2 | 4 | 4 | 2 |
+| $(\mathbb{Z}/15\mathbb{Z})^\ast$ | 1 | 7 | 13 | 4 | 11 | 2 | 8 | 14 |
+
+![(Z/15Z)* laid out as (Z/3Z)* x (Z/5Z)*, with the order of each element](assets/groups/orders-z15.png)
+*Not in the notes: the same table as a grid. The largest possible lcm is lcm(2, 4) = 4 < 8.*
+
+**More examples on cyclicity.**
+
+- $(\mathbb{Z}/8\mathbb{Z})^\ast = \lbrace 1, 3, 5, 7 \rbrace$ has order 4, but $3^2 = 9$, $5^2 = 25$, $7^2 = 49$ are all $\equiv 1$: every non-identity element has order 2. Not cyclic.
+- $(\mathbb{Z}/27\mathbb{Z})^\ast$ has order $\varphi(27) = 18 = 3^2 \cdot 2$, so orders are among $1, 2, 3, 6, 9, 18$. For $[2]$: $2^2 = 4$, $2^3 = 8$, $2^6 = 64 \equiv 10$, $2^9 = 512 \equiv 26$.
+  The order is not 1, 2, 3, 6 or 9, so it is 18, and the group is **cyclic**.
+- $(\mathbb{Z}/64\mathbb{Z})^\ast$ has order $\varphi(64) = 32 = 2^5$. If it were cyclic, it would have $\varphi(32) = 16$ elements of order 32, and the other 16 would have order dividing 16.
+  Take $[3]$: $3^2 = 9$, $3^4 = 81 \equiv 17$, $3^8 \equiv 17^2 = 289 \equiv 33$, $3^{16} \equiv 33^2 = 1089 \equiv 1$. So $o([3]) = 16$ and $\langle [3] \rangle$ has 16 elements:
+
+  | $k$ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 |
+  |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+  | $3^k \bmod 64$ | 3 | 9 | 27 | 17 | 51 | 25 | 11 | 33 | 35 | 41 | 59 | 49 | 19 | 57 | 43 | 1 |
+
+  If the group were cyclic, those 16 would be exactly the elements of order dividing 16 (a cyclic group of order 32 has exactly 16 of them), so every element **outside**
+  $\langle [3] \rangle$ would have order 32. But $[5] \notin \langle [3] \rangle$, and $5^2 = 25 = 3^6$, which has order $\frac{16}{\gcd(16, 6)} = 8$; so $o([5]) \le 16$ (in fact 16). **Not cyclic.**
+
+### Computing the order of an element
+
+For large groups we cannot try all powers. The trick of the $\mathbb{Z}/13$ example scales: **test $g^{\lvert G \rvert / p}$ for the primes $p$ dividing $\lvert G \rvert$**.
+
+*Example: $[2]$ in $(\mathbb{Z}/61\mathbb{Z})^\ast$*, of order $60 = 2^2 \cdot 3 \cdot 5$. We know $2^{60} \equiv 1$. With a computer: $2^{60/2} = 2^{30} \equiv 60$, $2^{60/3} = 2^{20} \equiv 47$,
+$2^{60/5} = 2^{12} \equiv 9$, none equal to 1. So $o([2])$ divides 60 but none of $30, 20, 12$: it is 60, and $[2]$ is a generator.
+
+*Example: $[2]$ in $(\mathbb{Z}/97\mathbb{Z})^\ast$*, of order $96 = 2^5 \cdot 3$. With a computer: $2^{48} \equiv 1$, but $2^{24} \equiv 96$; and $2^{32} \equiv 35$.
+So the order divides 48 but not 24 nor 32: it is 48.
+
+> [!TIP]
+> **Not in the notes: why "divides 48 but not 24 nor 32" forces 48.** The divisors of 48 are $1, 2, 3, 4, 6, 8, 12, 16, 24, 48$. All of them except 48 divide 24 or 16,
+> and 16 divides 32. So the only candidate left is 48. In general: removing a factor $p$ from the order means landing on a divisor of $\lvert G \rvert / p$.
+
+**Lemma 1.4.15.** Let $\lvert G \rvert = p_1^{a_1} \cdots p_n^{a_n}$ with distinct primes $p_i$ and $a_i \ge 1$, and $g \in G$. For each $i$, let $b_i$ be the largest integer
+such that $g^{\lvert G \rvert / p_i^{b_i}} = 1$. Then
+
+$$o(g) = \frac{\lvert G \rvert}{p_1^{b_1} p_2^{b_2} \cdots p_n^{b_n}}.$$
+
+*Proof.* Let $X = \frac{\lvert G \rvert}{p_1^{b_1} \cdots p_n^{b_n}}$. Since $g^{\lvert G \rvert} = 1$, each $b_i \ge 0$.
+
+**$o(g)$ divides $X$.** For each $i$, $g^{\lvert G \rvert / p_i^{b_i}} = 1$, so $o(g)$ divides $\frac{\lvert G \rvert}{p_i^{b_i}} = p_1^{a_1} \cdots p_i^{a_i - b_i} \cdots p_n^{a_n}$.
+Dividing all of these, $o(g)$ divides their gcd, which is $p_1^{a_1 - b_1} \cdots p_n^{a_n - b_n} = X$.
+
+**$o(g) = X$.** Suppose not. Since $g^X = 1$ (because $o(g) \mid X$), $X = a \cdot o(g)$ with $a > 1$. Some prime $p_i$ divides $a$, so $\frac{X}{p_i} = \frac{a}{p_i} o(g)$ is
+still a multiple of $o(g)$, and $g^{X / p_i} = 1$. But
+
+$$\frac{X}{p_i} = \frac{\lvert G \rvert}{p_1^{b_1} \cdots p_i^{b_i + 1} \cdots p_n^{b_n}}$$
+
+divides $\frac{\lvert G \rvert}{p_i^{b_i + 1}}$, so $g^{\lvert G \rvert / p_i^{b_i + 1}} = 1$ too, contradicting the choice of $b_i$ as the largest. So $o(g) = X$. ∎
+
+**The algorithm in practice.** For each prime $p_i$, keep dividing the exponent by $p_i$ while the power is still 1; $b_i$ counts how many divisions succeeded.
+
+*Example: $(\mathbb{Z}/385\mathbb{Z})^\ast$.* $385 = 5 \cdot 7 \cdot 11$, so the group has order $\varphi(385) = 4 \cdot 6 \cdot 10 = 240 = 2^4 \cdot 3 \cdot 5$, which has $5 \cdot 2 \cdot 2 = 20$ divisors.
+Order of $[2]$ (we know $2^{240} \equiv 1$):
+
+- prime 2: $2^{240/2} \equiv 1$, $2^{240/4} \equiv 1$, $2^{240/8} \equiv 309$: so $b_1 = 2$;
+- prime 3: $2^{240/3} \equiv 221$: $b_2 = 0$;
+- prime 5: $2^{240/5} \equiv 36$: $b_3 = 0$.
+
+So $o([2]) = \frac{240}{2^2 \cdot 3^0 \cdot 5^0} = 60$. Then $[8] = [2]^3$ has order $\frac{60}{\gcd(60, 3)} = 20$ (Lemma 1.4.5). The algorithm confirms it:
+for 2, $8^{120} \equiv 1$, $8^{60} \equiv 1$, $8^{30} \equiv 309$, so $b_1 = 2$; for 3, $8^{80} \equiv 1$, and the exponent of 3 in 240 is only 1, so $b_2 = 1$ and we stop;
+for 5, $8^{48} \equiv 71$, so $b_3 = 0$. Hence $o([8]) = \frac{240}{2^2 \cdot 3} = 20$.
+
+**Remark.** If $\lvert G \rvert = p_1^{a_1} \cdots p_n^{a_n}$, it has $(a_1 + 1) \cdots (a_n + 1)$ divisors, but the algorithm needs at most $a_1 + \dots + a_n$ steps. The catch: it requires the
+**factorization of $\lvert G \rvert$**.
+
+**Lemma 1.4.16.** Let $n = \lvert G \rvert$ and $g \in G$. If $g^{n/p} \neq 1$ for every prime $p \mid n$, then $G$ is cyclic and $g$ is a generator.
+
+*Proof.* In Lemma 1.4.15 all $b_i = 0$, so $o(g) = n$. ∎
+
+This is the test used above for $[2]$ in $(\mathbb{Z}/61\mathbb{Z})^\ast$. It is how generators are found in practice: pick a random $g$ and check $g^{n/p} \neq 1$ for each prime $p \mid n$.
+
+### When is $(\mathbb{Z}/m\mathbb{Z})^\ast$ cyclic?
+
+**Lemma 1.4.17.** Every $m \ge 2$ falls in (at least) one of these cases:
+
+1. $m = m_1 m_2$ with $m_1, m_2 \ge 3$ and $\gcd(m_1, m_2) = 1$;
+2. $m = 2p^n$ with $p$ an odd prime, $n \ge 1$;
+3. $m = p^n$ with $p$ an odd prime, $n \ge 1$;
+4. $m = 2^n$, $n \ge 1$.
+
+*Proof.* Write $m = p_1^{a_1} \cdots p_n^{a_n}$ with $p_1 < \dots < p_n$. If there is one prime ($n = 1$), we are in case 3 or 4. If there are two primes, $a_1 = 1$ and $p_1 = 2$,
+then $m = 2p_2^{a_2}$: case 2. If there are two primes and $a_1 > 1$ or $p_1 > 2$, take $m_1 = p_1^{a_1}$, $m_2 = p_2^{a_2}$, both at least 3: case 1.
+If there are three or more primes, take $m_1 = p_1^{a_1} p_2^{a_2}$ and $m_2 = p_3^{a_3} \cdots p_n^{a_n}$: case 1. ∎
+
+**Theorem 1.4.18.** Let $m \ge 2$.
+
+1. If $m = m_1 m_2$ with $m_1, m_2 \ge 3$ coprime, $(\mathbb{Z}/m\mathbb{Z})^\ast$ is **not** cyclic.
+2. If $m = 2p^n$ ($p$ odd prime), it is cyclic.
+3. If $m = p^n$ ($p$ odd prime), it is cyclic.
+4. If $m = 2^n$, it is cyclic if and only if $n = 1, 2$.
+
+The notes state it without proof.
+
+> [!TIP]
+> **Not in the notes: why case 1 is not cyclic.** $(\mathbb{Z}/m\mathbb{Z})^\ast \cong (\mathbb{Z}/m_1\mathbb{Z})^\ast \times (\mathbb{Z}/m_2\mathbb{Z})^\ast$. For $k \ge 3$, $\varphi(k)$ is even,
+> so both factors have even order and each contains $-1 \neq 1$ of order 2. By Lemma 1.4.14 every element has order at most $\mathrm{lcm}(\varphi(m_1), \varphi(m_2))$,
+> which is smaller than $\varphi(m_1)\varphi(m_2)$ because both numbers are even (their gcd is at least 2). So no element reaches the order of the group.
+> This covers $(\mathbb{Z}/12\mathbb{Z})^\ast$ ($12 = 4 \cdot 3$) and $(\mathbb{Z}/15\mathbb{Z})^\ast$ ($15 = 3 \cdot 5$); case 4 covers $(\mathbb{Z}/8\mathbb{Z})^\ast$ and $(\mathbb{Z}/64\mathbb{Z})^\ast$;
+> case 3 covers $(\mathbb{Z}/27\mathbb{Z})^\ast$.
+
+**Counting elements of each order: $(\mathbb{Z}/75\mathbb{Z})^\ast$.** $75 = 3 \cdot 5^2$, so the order is $\varphi(75) = 2 \cdot 20 = 40$ and
+$(\mathbb{Z}/75\mathbb{Z})^\ast \cong (\mathbb{Z}/3\mathbb{Z})^\ast \times (\mathbb{Z}/25\mathbb{Z})^\ast$, both cyclic (case 3), of orders 2 and 20.
+
+In $(\mathbb{Z}/25\mathbb{Z})^\ast = \lbrace g, g^2, \dots, g^{20} \rbrace$ ($g$ a generator), $o(g^k) = \frac{20}{\gcd(k, 20)}$. For example, $o(g^k) = 10$ iff $\gcd(k, 20) = 2$,
+iff $k = 2k'$ with $1 \le k' \le 10$ and $\gcd(k', 10) = 1$: there are $\varphi(10) = 4$ such $k'$. The same reasoning for every divisor gives:
+
+| $(\mathbb{Z}/3\mathbb{Z})^\ast$: order $a$ | 1 | 2 |
+|---|---|---|
+| elements of order $a$ | 1 | 1 |
+
+| $(\mathbb{Z}/25\mathbb{Z})^\ast$: order $a$ | 1 | 2 | 4 | 5 | 10 | 20 |
+|---|---|---|---|---|---|---|
+| elements of order $a$ | 1 | 1 | 2 | 4 | 4 | 8 |
+
+> In a cyclic group, for each divisor $a$ of the order there are exactly $\varphi(a)$ elements of order $a$, and exactly $a$ elements whose order divides $a$.
+
+Combining with Lemma 1.4.14 (the order of a pair is the lcm):
+
+| $(\mathbb{Z}/75\mathbb{Z})^\ast$: order $a$ | 1 | 2 | 4 | 5 | 8 | 10 | 20 | 40 |
+|---|---|---|---|---|---|---|---|---|
+| elements of order $a$ | 1 | 3 | 4 | 4 | 0 | 12 | 16 | 0 |
+
+No element of order 40: not cyclic, as case 1 of Theorem 1.4.18 predicts ($75 = 3 \cdot 25$).
+
+> [!NOTE]
+> **Not in the notes: where the numbers come from.** Pair an element of order $x$ in $(\mathbb{Z}/3)^\ast$ with one of order $y$ in $(\mathbb{Z}/25)^\ast$; the pair has order $\mathrm{lcm}(x, y)$.
+> Order 10: $(1, 10)$ gives $1 \cdot 4$, $(2, 10)$ gives $1 \cdot 4$, $(2, 5)$ gives $1 \cdot 4$: total 12. Order 2: $(2, 1)$, $(1, 2)$, $(2, 2)$: total 3.
+> Order 20: $(1, 20)$ and $(2, 20)$ give $8 + 8 = 16$. Order 4: $(1, 4)$ and $(2, 4)$ give $2 + 2 = 4$. The counts add up to $1 + 3 + 4 + 4 + 12 + 16 = 40$.
+
+Practice: [Exercises 11 to 16](exercises/algebra.md#exercise-11).
+
+---
+
 # Cheat sheet
 
 - Semigroup → monoid → group, and ring → commutative ring with identity → field: each step adds one requirement.
@@ -689,3 +1109,10 @@ Note that the formula **needs the factorization of $m$**.
 - Homomorphisms preserve invertible elements, not zero divisors.
 - CRT: $\mathbb{Z}/m\mathbb{Z} \cong \mathbb{Z}/m_1\mathbb{Z} \times \dots \times \mathbb{Z}/m_n\mathbb{Z}$ for pairwise coprime $m_i$; hence $\varphi$ is multiplicative on coprime factors.
 - $\varphi(m) = m \prod_{p \mid m} (1 - 1/p)$, which requires the factorization of $m$.
+- **Order** $o(g)$: smallest $n > 0$ with $g^n = 1$. $g^m = 1 \iff o(g) \mid m$; exponents live modulo $o(g)$; $o(g^m) = o(g)/\gcd(o(g), m)$.
+- $o(g) = \lvert \langle g \rangle \rvert$. **Lagrange**: $\lvert H \rvert$ divides $\lvert G \rvert$, so $o(g) \mid \lvert G \rvert$ and $g^{\lvert G \rvert} = 1$, $g^{-1} = g^{\lvert G \rvert - 1}$. The converse is false.
+- **Euler**: $a^{\varphi(m)} \equiv 1 \pmod m$ if $\gcd(a, m) = 1$. **Fermat**: $a^{p-1} \equiv 1 \pmod p$ if $p \nmid a$.
+- Cyclic $\iff$ some element has order $\lvert G \rvert$; a cyclic group has $\varphi(\lvert G \rvert)$ generators and $\varphi(a)$ elements of each order $a \mid \lvert G \rvert$.
+- In a product, $o((g, h)) = \mathrm{lcm}(o(g), o(h))$.
+- Order in practice: for each prime $p \mid \lvert G \rvert$, divide the exponent by $p$ while the power stays 1 (Lemma 1.4.15). $g$ is a generator iff $g^{\lvert G \rvert / p} \neq 1$ for all primes $p \mid \lvert G \rvert$.
+- $(\mathbb{Z}/m\mathbb{Z})^\ast$ is cyclic exactly for $m = 2, 4, p^n, 2p^n$ ($p$ odd prime).

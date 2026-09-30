@@ -13,7 +13,7 @@
 ## Contents
 
 - [Summary](summary.md)
-- [Exercises and past exams](exercises/): [algebra](exercises/algebra.md) (sections 1.1, 1.2 and 1.3)
+- [Exercises and past exams](exercises/): [algebra](exercises/algebra.md) (sections 1.1 to 1.4)
 
 ## Exam
 
@@ -32,7 +32,7 @@ From the index of the lecturer's notes. Links point to the matching section of t
 - [1.1 Basic notions](summary.md#11-basic-notions)
 - [1.2 The ring Z/mZ](summary.md#12-the-ring-zmz)
 - [1.3 Direct products and homomorphisms](summary.md#13-direct-products-and-homomorphisms)
-- 1.4 Groups
+- [1.4 Groups](summary.md#14-groups)
 - 1.5 Polynomial rings
 - 1.6 Finite fields
 - 1.7 Linear algebra revisited
