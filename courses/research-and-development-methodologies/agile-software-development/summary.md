@@ -663,7 +663,7 @@ Three activities: **managing the accrual** of debt, **making it visible**, and *
 
 - **Use good technical practices:** there is no formal list, but the most common are **test-driven development, continuous integration, automated testing and refactoring**.
   Cunningham describes "just-in-time refactoring": a customer wants a feature that doesn't fit in the code, so you first reorganize the code to make a place for it, then the feature is easy to add.
-- **Use a strong definition of done:** the more it includes, the less debt is acquired.
+- **Use a strong definition of done:** the more stringent it is about the work that must really be finished (tested, integrated, reviewed), the less debt is acquired.
 - **Understand the economics of debt:** decide whether taking on more debt makes economic sense.
 
 > [!NOTE]
