@@ -26,6 +26,8 @@ the maintainer updates them.**
 
 For courses split into modules (e.g. Intelligent Systems), each module has its own summary:
 `courses/intelligent-systems/automated-planning/summary.md`.
+A module can also have **extra parts** in other Markdown files next to its summary (e.g. `agile-software-development/labs.md`
+for the lab lectures): link them from the summary. In the PDF they come after the summaries of all modules, in alphabetical order.
 
 ## How to write
 

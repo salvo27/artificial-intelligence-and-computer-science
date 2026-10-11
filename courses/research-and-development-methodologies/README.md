@@ -14,7 +14,7 @@
 
 | Module | ECTS | |
 |---|---|---|
-| Agile Software Development | 6 | [summary](agile-software-development/summary.md) |
+| Agile Software Development | 6 | [summary](agile-software-development/summary.md) · [part 2: labs on CI/CD and testing](agile-software-development/labs.md) |
 | Research Seminars in AI&CS | 3 | [summary](research-seminars/summary.md) |
 
 - [Exercises and past exams](exercises/)
@@ -33,8 +33,8 @@ Topics in the order of the lectures. Links point to the matching section of the 
 5. [Requirements and user stories](agile-software-development/summary.md#5-requirements-and-user-stories), [the product backlog](agile-software-development/summary.md#6-the-product-backlog)
 6. [Estimation and velocity](agile-software-development/summary.md#7-estimation-and-velocity), [technical debt](agile-software-development/summary.md#8-technical-debt)
 7. [Planning](agile-software-development/summary.md#9-planning), [sprint planning](agile-software-development/summary.md#10-sprint-planning), [sprint execution](agile-software-development/summary.md#11-sprint-execution)
-8. CI/CD pipelines with GitHub Actions, with practice _(no slides yet)_
-9. Test-driven development, with practice _(no slides yet)_
+8. [CI/CD pipelines with GitHub Actions](agile-software-development/labs.md#lab-1-cicd-pipelines), with practice (Lab 1)
+9. [Software testing and test-driven development](agile-software-development/labs.md#lab-2-software-testing), with practice (Lab 2)
 10. [Sprint review](agile-software-development/summary.md#12-sprint-review), [sprint retrospective](agile-software-development/summary.md#13-sprint-retrospective)
 11. JIRA and requirement workshop _(no slides yet)_
 12. Test doubles, with practice _(no slides yet)_

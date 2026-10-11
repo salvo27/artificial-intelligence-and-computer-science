@@ -7,9 +7,9 @@ The sections follow the order of the lectures.
 Explanations and examples that are not in the slides are marked **Not in the slides**. Figures marked
 *From the slides* are taken from the lecturer's material.
 
-**Progress:** all the Scrum slides are covered.
-The lectures on CI/CD, test-driven development, JIRA and test doubles have no slides yet; enterprise applications and the Java notions
-are summarized at the end as supporting material.
+**Progress:** all the Scrum slides are covered. The two lab lectures (CI/CD pipelines and software testing) are summarized in
+[part 2: labs](labs.md), which comes after the Research Seminars in the PDF. The lectures on JIRA and test doubles have no slides yet;
+enterprise applications and the Java notions are summarized at the end as supporting material.
 
 **Practice:** [exam simulator](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/)
 (multiple-choice and open questions with explanations) and [visual map of Scrum](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/map.html).

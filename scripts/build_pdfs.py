@@ -38,13 +38,16 @@ def find_chrome():
 
 
 def course_inputs(course):
-    """Markdown files of a course, in reading order: summaries first, then exercises."""
+    """Markdown files of a course, in reading order: the summary of each module, then the extra parts
+    of each module (any other .md next to a summary, e.g. labs.md), then the exercises."""
     base = ROOT / "courses" / course["slug"]
     if course["modules"]:
         units = [base / m["slug"] for m in course["modules"]]
     else:
         units = [base]
     files = [u / "summary.md" for u in units]
+    for u in units:
+        files += sorted(f for f in u.glob("*.md") if f.name not in ("summary.md", "README.md"))
     files += sorted((base / "exercises").glob("*.md"))
     return [f for f in files if f.exists()], [base] + units + [base / "exercises"]
 
