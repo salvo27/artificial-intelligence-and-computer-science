@@ -5,7 +5,9 @@
 # Source: official study plan, 2026/27 cohort
 # https://corsi.unical.it/lm/artificial-intelligence-and-computer-science/cds/studiare/
 
-# GitHub repository, used for the PDF download links.
+# GitHub repository, used for the PDF download links and the GitHub Pages address of the quizzes.
+# A course or module with "quiz: true" has an interactive quiz in <its folder>/quiz/index.html,
+# published on GitHub Pages and linked in the index next to the PDF.
 repository: salvo27/artificial-intelligence-and-computer-science
 
 degree:
@@ -59,6 +61,7 @@ courses:
         name: Agile Software Development
         code: "27007802"
         ects: 6
+        quiz: true   # interactive exam simulator in agile-software-development/quiz/
       - slug: research-seminars
         name: Research Seminars in AI&CS
         ects: 3

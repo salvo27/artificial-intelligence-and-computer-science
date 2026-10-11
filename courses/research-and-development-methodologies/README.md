@@ -18,6 +18,7 @@
 | Research Seminars in AI&CS | 3 | [summary](research-seminars/summary.md) |
 
 - [Exercises and past exams](exercises/)
+- **Agile Software Development, interactive:** [exam simulator](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/) (370 multiple-choice and 62 open questions on Scrum, CI/CD and testing) and [visual map of Scrum](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/map.html). Source in [`agile-software-development/quiz/`](agile-software-development/quiz/).
 
 ## Syllabus
 

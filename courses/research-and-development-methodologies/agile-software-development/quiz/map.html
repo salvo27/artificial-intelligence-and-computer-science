@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mappa di Scrum e CI/CD</title>
+<style>
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+img { max-width: 100%; }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one tall drawn diagram, nine bands top to bottom (why, people, planning levels, backlog, sprint cycle, measures, quality, lab 1, lab 2); details open in a bottom drawer. of the Scrum framework (people on top, the sprint cycle in the middle, measures and the CI/CD lab at the bottom), with a detail panel under it. */
+:root {
+  --bg: #eef1f5;
+  --paper: #ffffff;
+  --ink: #17202b;
+  --muted: #5d6877;
+  --line: #cfd6e0;
+  --soft: #f5f7fa;
+  --accent: #2f5bd3;
+  --po: #b0307a;
+  --sm: #0d7f74;
+  --dev: #2c62c9;
+  --st: #b26a00;
+  --sprint: #e9590c;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1318; --paper: #182029; --ink: #e7ebf1; --muted: #9ba6b5; --line: #334050; --soft: #1f2833; --accent: #86a6ff;
+    --po: #ec7fc0; --sm: #3fc7b6; --dev: #7ea6ff; --st: #f0b04a; --sprint: #ff8a4c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1318; --paper: #182029; --ink: #e7ebf1; --muted: #9ba6b5; --line: #334050; --soft: #1f2833; --accent: #86a6ff;
+  --po: #ec7fc0; --sm: #3fc7b6; --dev: #7ea6ff; --st: #f0b04a; --sprint: #ff8a4c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.45; }
+.wrap { padding-inline: 16px; padding-block: 20px 60px; max-width: 1480px; margin: 0 auto; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.6rem, 2.6vw, 2.2rem); margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 4px 0 14px; max-width: 80ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 10px; font-size: 0.9rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.scroller { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; }
+svg.map { display: block; width: 100%; min-width: 1050px; height: auto; }
+svg text { font-family: var(--font-body); fill: var(--ink); }
+svg .t-title { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+svg .t-big { font-family: var(--font-display); font-weight: 700; font-size: 26px; }
+svg .t-sec { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; fill: var(--muted); }
+svg .t-small { font-size: 13.5px; fill: var(--muted); }
+svg .t-tiny { font-size: 12px; fill: var(--muted); }
+svg .t-strong { font-weight: 700; font-size: 15px; }
+svg .box { fill: var(--soft); stroke: var(--line); stroke-width: 1.5; }
+svg .card { fill: var(--paper); stroke: var(--line); stroke-width: 1.2; }
+svg .arrow { fill: none; stroke: var(--ink); stroke-width: 2.2; }
+svg .arrow-soft { fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 6 5; }
+svg .head { fill: var(--ink); }
+svg .head-soft { fill: var(--muted); }
+svg .hit { cursor: pointer; }
+svg .hit:hover .box, svg .hit:hover .card, svg .hit:focus .box, svg .hit:focus .card { stroke: var(--accent); stroke-width: 2.5; }
+svg .hit.sel .box, svg .hit.sel .card { stroke: var(--accent); stroke-width: 3; }
+svg .hit:focus { outline: none; }
+.dot-po { fill: var(--po); } .dot-sm { fill: var(--sm); } .dot-dev { fill: var(--dev); } .dot-st { fill: var(--st); }
+.panel { margin-top: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 28px; }
+.panel .k { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.panel h2 { font-family: var(--font-display); font-size: 1.45rem; margin: 2px 0 6px; }
+.panel p { margin: 0 0 8px; max-width: 70ch; }
+.panel dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; align-content: start; }
+.panel dt { font-weight: 700; }
+.panel dd { margin: 0; }
+.who { display: flex; flex-wrap: wrap; gap: 6px; }
+.who span { font-size: 0.85rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+@media (max-width: 760px) { .panel { grid-template-columns: minmax(0, 1fr); } }
+
+.wrap { padding-bottom: 46vh; }
+.panel { position: fixed; left: 16px; right: 16px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); max-width: 1180px; margin: 0 auto; max-height: 42vh; overflow: auto; box-shadow: 0 10px 40px rgb(0 0 0 / .25); z-index: 5; }
+.panel .close { position: sticky; top: 0; float: right; font: inherit; font-weight: 600; border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+.panel[hidden] { display: none; }
+.toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.toc span { font-size: .85rem; padding: 3px 10px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <h1>Mappa di Scrum e CI/CD</h1>
+  <p class="sub">Tutto il corso di Agile Software Development in un unico schema, da leggere dall'alto in basso: perché Scrum, chi sono le persone, i livelli di pianificazione, come nascono i requisiti, il ciclo dello sprint, stime e misure, qualità e debito tecnico, e i due laboratori. I pallini colorati dicono chi partecipa. Clicca qualsiasi riquadro per la spiegazione completa.</p>
+  <p class="sub" style="font-weight:600"><a href="index.html" style="color:var(--accent)">Simulatore d'esame</a> · <a href="https://github.com/salvo27/artificial-intelligence-and-computer-science/blob/main/courses/research-and-development-methodologies/agile-software-development/summary.md" style="color:var(--accent)">Riassunto del corso</a></p>
+  <div class="toc"><span>1 Perché Scrum</span><span>2 Persone</span><span>3 Livelli di pianificazione</span><span>4 Requisiti e backlog</span><span>5 Ciclo dello sprint</span><span>6 Stime e misure</span><span>7 Qualità e debito</span><span>8 Lab CI/CD</span><span>9 Lab testing</span></div>
+  <div class="legend" aria-label="Legenda dei partecipanti">
+    <span><i style="background:var(--po)"></i>Product owner</span>
+    <span><i style="background:var(--sm)"></i>ScrumMaster</span>
+    <span><i style="background:var(--dev)"></i>Developers</span>
+    <span><i style="background:var(--st)"></i>Stakeholder</span>
+  </div>
+  <div class="scroller">
+  <svg class="map" viewBox="0 0 1400 2910" role="img" aria-label="Schema completo del framework Scrum e dei laboratori">
+<defs>
+      <symbol id="person" viewBox="0 0 40 50"><circle cx="20" cy="11" r="9"/><path d="M3 50 C3 31 37 31 37 50 Z"/></symbol>
+      <marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="head"/></marker>
+      <marker id="ahs" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="head-soft"/></marker>
+    </defs>
+<text x="30" y="34" class="t-sec">1 · PERCHÉ SCRUM: DA DOVE NASCE</text>
+<g class="hit" data-id="plan" tabindex="0"><rect x="30" y="50" width="270" height="180" rx="12" class="box"/>
+<text x="46" y="78" class="t-strong">Plan-driven (waterfall)</text>
+<text x="46" y="100" class="t-small">Tutto pianificato all&#x27;inizio,</text>
+<text x="46" y="118" class="t-small">fasi in sequenza: analisi →</text>
+<text x="46" y="136" class="t-small">design → codice → test.</text>
+<text x="46" y="154" class="t-small">Feedback solo alla fine.</text>
+<text x="46" y="172" class="t-small">Ok per problemi prevedibili.</text>
+</g>
+<path d="M302 140 L328 140" class="arrow" marker-end="url(#ah)"/>
+<text x="304" y="130" class="t-tiny" >vs</text>
+<g class="hit" data-id="agile" tabindex="0"><rect x="332" y="50" width="300" height="180" rx="12" class="box"/>
+<text x="348" y="78" class="t-strong">Agile Manifesto (2001)</text>
+<text x="348" y="100" class="t-small">Individui e interazioni &gt; processi</text>
+<text x="348" y="118" class="t-small">Software funzionante &gt; documenti</text>
+<text x="348" y="136" class="t-small">Collaborazione col cliente &gt; contratti</text>
+<text x="348" y="154" class="t-small">Rispondere al cambiamento &gt; piano</text>
+<text x="348" y="172" class="t-small">(«&gt;»: entrambi valgono, a sx di più)</text>
+</g>
+<path d="M634 140 L660 140" class="arrow" marker-end="url(#ah)"/>
+<g class="hit" data-id="princ" tabindex="0"><rect x="664" y="50" width="440" height="180" rx="12" class="box"/>
+<text x="680" y="78" class="t-strong">Principi agili di Scrum (6 aree)</text>
+<text x="680" y="100" class="t-small">Variabilità e incertezza: iterativo + incrementale,</text>
+<text x="680" y="118" class="t-small">   ispezione-adattamento-trasparenza, end/means/customer</text>
+<text x="680" y="136" class="t-small">Previsione e adattamento: last responsible moment</text>
+<text x="680" y="154" class="t-small">Validated learning: validare presto, feedback veloce</text>
+<text x="680" y="172" class="t-small">WIP: batch piccoli, idle work &gt; idle workers, cost of delay</text>
+<text x="680" y="190" class="t-small">Progresso e performance: ritmo sostenibile, qualità dentro</text>
+</g>
+<g class="hit" data-id="cynefin" tabindex="0"><rect x="1124" y="50" width="246" height="180" rx="12" class="box"/>
+<text x="1140" y="78" class="t-strong">Cynefin: quando usarlo</text>
+<text x="1140" y="100" class="t-small">Complesso: Scrum ideale</text>
+<text x="1140" y="118" class="t-small">Complicato: funziona</text>
+<text x="1140" y="136" class="t-small">Semplice: non il più efficiente</text>
+<text x="1140" y="154" class="t-small">Caotico: no, serve agire subito</text>
+<text x="1140" y="172" class="t-small">Interruzioni: meglio Kanban</text>
+</g>
+<g transform="translate(0,240)"><!-- ===== PERSONE ===== -->
+    <text x="30" y="34" class="t-sec">2 · LE PERSONE: CHI FA COSA</text>
+
+    <g class="hit" data-id="stake" tabindex="0">
+      <rect x="30" y="48" width="270" height="200" rx="14" class="box" style="stroke-dasharray:6 5"/>
+      <use href="#person" x="58" y="72" width="40" height="50" style="fill:var(--st)"/>
+      <use href="#person" x="110" y="66" width="44" height="56" style="fill:var(--st)"/>
+      <use href="#person" x="166" y="72" width="40" height="50" style="fill:var(--st)"/>
+      <use href="#person" x="216" y="76" width="36" height="46" style="fill:var(--st);opacity:.7"/>
+      <text x="50" y="150" class="t-title">Stakeholder</text>
+      <text x="50" y="174" class="t-small">Fuori dallo Scrum team:</text>
+      <text x="50" y="193" class="t-small">clienti, utenti, manager,</text>
+      <text x="50" y="212" class="t-small">vendite, supporto, altri team.</text>
+      <text x="50" y="234" class="t-small">Danno feedback nella review.</text>
+    </g>
+
+    <g class="hit" data-id="team" tabindex="0">
+      <rect x="330" y="48" width="1040" height="200" rx="14" class="box"/>
+      <text x="350" y="74" class="t-strong">SCRUM TEAM</text>
+      <text x="470" y="74" class="t-tiny">cross-functional, auto-organizzato, senza gerarchie</text>
+    </g>
+
+    <g class="hit" data-id="po" tabindex="0">
+      <rect x="350" y="88" width="320" height="146" rx="10" class="card"/>
+      <use href="#person" x="366" y="104" width="48" height="60" style="fill:var(--po)"/>
+      <text x="426" y="124" class="t-title" style="fill:var(--po)">Product owner</text>
+      <text x="426" y="146" class="t-small">Decide COSA costruire</text>
+      <text x="426" y="164" class="t-small">e IN CHE ORDINE.</text>
+      <text x="366" y="190" class="t-small">Gestisce il product backlog, propone</text>
+      <text x="366" y="208" class="t-small">il goal, dice se un item è done.</text>
+      <text x="366" y="226" class="t-tiny">Una sola persona, non un comitato.</text>
+    </g>
+
+    <g class="hit" data-id="sm" tabindex="0">
+      <rect x="690" y="88" width="320" height="146" rx="10" class="card"/>
+      <use href="#person" x="706" y="104" width="48" height="60" style="fill:var(--sm)"/>
+      <text x="766" y="124" class="t-title" style="fill:var(--sm)">ScrumMaster</text>
+      <text x="766" y="146" class="t-small">Un leader, non un capo.</text>
+      <text x="766" y="164" class="t-small">Coach e facilitatore.</text>
+      <text x="706" y="190" class="t-small">Rimuove gli impedimenti, protegge</text>
+      <text x="706" y="208" class="t-small">il team, fa rispettare Scrum.</text>
+      <text x="706" y="226" class="t-tiny">Non assegna il lavoro.</text>
+    </g>
+
+    <g class="hit" data-id="dev" tabindex="0">
+      <rect x="1030" y="88" width="320" height="146" rx="10" class="card"/>
+      <use href="#person" x="1046" y="110" width="34" height="44" style="fill:var(--dev)"/>
+      <use href="#person" x="1074" y="104" width="40" height="50" style="fill:var(--dev)"/>
+      <use href="#person" x="1108" y="110" width="34" height="44" style="fill:var(--dev)"/>
+      <text x="1150" y="124" class="t-title" style="fill:var(--dev)">Developers</text>
+      <text x="1150" y="146" class="t-small">Decidono COME.</text>
+      <text x="1150" y="164" class="t-small">Da 5 a 9 persone.</text>
+      <text x="1046" y="190" class="t-small">Stimano, si impegnano sul goal,</text>
+      <text x="1046" y="208" class="t-small">costruiscono e testano l'increment.</text>
+      <text x="1046" y="226" class="t-tiny">Responsabili della qualità (DoD).</text>
+    </g>
+
+    </g>
+<text x="30" y="530" class="t-sec">3 · I CINQUE LIVELLI DI PIANIFICAZIONE: DAL PIÙ LONTANO AL PIÙ VICINO</text>
+<g class="hit" data-id="portf" tabindex="0"><rect x="30" y="546" width="248" height="180" rx="12" class="box"/>
+<text x="46" y="574" class="t-title">Portfolio planning</text>
+<text x="46" y="600" class="t-small">≥ 1 anno</text>
+<text x="46" y="619" class="t-small">Quali prodotti fare,</text>
+<text x="46" y="638" class="t-small">in che ordine, quanto.</text>
+<text x="46" y="657" class="t-small">→ portfolio backlog</text>
+<circle cx="52" cy="710" r="7" class="dot-st"/>
+<circle cx="70" cy="710" r="7" class="dot-po"/>
+</g>
+<path d="M280 636 L300 636" class="arrow" marker-end="url(#ah)"/>
+<g class="hit" data-id="envis" tabindex="0"><rect x="303" y="546" width="248" height="180" rx="12" class="box"/>
+<text x="319" y="574" class="t-title">Product planning</text>
+<text x="319" y="600" class="t-small">(envisioning) mesi o più</text>
+<text x="319" y="619" class="t-small">Idea → visione →</text>
+<text x="319" y="638" class="t-small">backlog di alto livello</text>
+<text x="319" y="657" class="t-small">(epic) → roadmap</text>
+<circle cx="325" cy="710" r="7" class="dot-po"/>
+<circle cx="343" cy="710" r="7" class="dot-st"/>
+</g>
+<path d="M553 636 L573 636" class="arrow" marker-end="url(#ah)"/>
+<g class="hit" data-id="rel" tabindex="0"><rect x="576" y="546" width="248" height="180" rx="12" class="box"/>
+<text x="592" y="574" class="t-title">Release planning</text>
+<text x="592" y="600" class="t-small">3-9 mesi</text>
+<text x="592" y="619" class="t-small">Scope, data e budget:</text>
+<text x="592" y="638" class="t-small">fixed date o fixed scope</text>
+<text x="592" y="657" class="t-small">→ release plan</text>
+<circle cx="598" cy="710" r="7" class="dot-po"/>
+<circle cx="616" cy="710" r="7" class="dot-sm"/>
+<circle cx="634" cy="710" r="7" class="dot-dev"/>
+<circle cx="652" cy="710" r="7" class="dot-st"/>
+</g>
+<path d="M826 636 L846 636" class="arrow" marker-end="url(#ah)"/>
+<g class="hit" data-id="splanlv" tabindex="0"><rect x="849" y="546" width="248" height="180" rx="12" class="box"/>
+<text x="865" y="574" class="t-title">Sprint planning</text>
+<text x="865" y="600" class="t-small">ogni sprint (1-4 sett.)</text>
+<text x="865" y="619" class="t-small">Quali item nel prossimo</text>
+<text x="865" y="638" class="t-small">sprint e come farli</text>
+<text x="865" y="657" class="t-small">→ goal + sprint backlog</text>
+<circle cx="871" cy="710" r="7" class="dot-po"/>
+<circle cx="889" cy="710" r="7" class="dot-sm"/>
+<circle cx="907" cy="710" r="7" class="dot-dev"/>
+</g>
+<path d="M1099 636 L1119 636" class="arrow" marker-end="url(#ah)"/>
+<g class="hit" data-id="dailylv" tabindex="0"><rect x="1122" y="546" width="248" height="180" rx="12" class="box"/>
+<text x="1138" y="574" class="t-title">Daily planning</text>
+<text x="1138" y="600" class="t-small">ogni giorno</text>
+<text x="1138" y="619" class="t-small">Il daily scrum: come</text>
+<text x="1138" y="638" class="t-small">completare gli item</text>
+<text x="1138" y="657" class="t-small">→ piano del giorno</text>
+<circle cx="1144" cy="710" r="7" class="dot-dev"/>
+<circle cx="1162" cy="710" r="7" class="dot-sm"/>
+</g>
+<text x="30" y="752" class="t-small" >Scrum definisce formalmente solo sprint e daily planning; portfolio, product e release sono livelli che quasi tutte le organizzazioni aggiungono. Favorire release piccole e frequenti.</text>
+<text x="30" y="800" class="t-sec">4 · DAI REQUISITI AL PRODUCT BACKLOG</text>
+<g class="hit" data-id="wshop" tabindex="0"><rect x="30" y="816" width="230" height="190" rx="12" class="box"/>
+<text x="46" y="844" class="t-strong">Come nascono le storie</text>
+<text x="46" y="866" class="t-small">Story-writing workshop:</text>
+<text x="46" y="884" class="t-small">PO, team, stakeholder;</text>
+<text x="46" y="902" class="t-small">user role e personas</text>
+<text x="46" y="920" class="t-small">Story mapping: vista 2D</text>
+<text x="46" y="938" class="t-small">lungo il flusso utente</text>
+<circle cx="52" cy="990" r="7" class="dot-po"/>
+<circle cx="70" cy="990" r="7" class="dot-dev"/>
+<circle cx="88" cy="990" r="7" class="dot-st"/>
+</g>
+<path d="M262 910 L286 910" class="arrow" marker-end="url(#ah)"/>
+<g class="hit" data-id="story" tabindex="0"><rect x="290" y="816" width="270" height="190" rx="12" class="box"/>
+<text x="306" y="844" class="t-strong">User story (le 3 C)</text>
+<text x="306" y="866" class="t-small">«As a &lt;ruolo&gt;, I want &lt;goal&gt;</text>
+<text x="306" y="884" class="t-small">  so that &lt;beneficio&gt;»</text>
+<text x="306" y="902" class="t-small">Card: poche frasi</text>
+<text x="306" y="920" class="t-small">Conversation: la promessa</text>
+<text x="306" y="938" class="t-small">Confirmation: acceptance criteria</text>
+</g>
+<g class="hit" data-id="invest" tabindex="0"><rect x="580" y="816" width="200" height="190" rx="12" class="box"/>
+<text x="596" y="844" class="t-strong">INVEST</text>
+<text x="596" y="866" class="t-small">Independent</text>
+<text x="596" y="884" class="t-small">Negotiable</text>
+<text x="596" y="902" class="t-small">Valuable</text>
+<text x="596" y="920" class="t-small">Estimatable</text>
+<text x="596" y="938" class="t-small">Small · Testable</text>
+</g>
+<g class="hit" data-id="levels" tabindex="0"><rect x="800" y="816" width="270" height="190" rx="12" class="box"/>
+<text x="816" y="844" class="t-strong">Livelli di dettaglio</text>
+<text x="816" y="866" class="t-small">Epic: mesi</text>
+<text x="816" y="884" class="t-small">  └ Feature: settimane</text>
+<text x="816" y="902" class="t-small">      └ Story: giorni (sprintable)</text>
+<text x="816" y="920" class="t-small">          └ Task: ore</text>
+<text x="816" y="938" class="t-small">Theme: gruppo di storie</text>
+</g>
+<g class="hit" data-id="pbitypes" tabindex="0"><rect x="1090" y="816" width="280" height="190" rx="12" class="box"/>
+<text x="1106" y="844" class="t-strong">Tipi di PBI</text>
+<text x="1106" y="866" class="t-small">Feature e change</text>
+<text x="1106" y="884" class="t-small">Defect</text>
+<text x="1106" y="902" class="t-small">Technical improvement</text>
+<text x="1106" y="920" class="t-small">Knowledge acquisition (spike)</text>
+<text x="1106" y="938" class="t-small">Requisiti non funzionali → DoD</text>
+</g>
+<text x="30" y="1032" class="t-small" >Tutti diventano product backlog item (PBI): grandi e vaghi all&#x27;inizio, divisi just in time (progressive refinement) e portati a «ready» dal grooming. ↓</text>
+<g transform="translate(0,770)"><!-- ===== IL CICLO ===== -->
+    <text x="30" y="300" class="t-sec">5 · IL CICLO DI UNO SPRINT: IL CUORE DI SCRUM</text>
+
+    <!-- feedback dalla review al backlog -->
+    <path d="M1300 360 C1300 312 1100 318 700 318 C330 318 150 318 140 352" class="arrow-soft" marker-end="url(#ahs)"/>
+    <text x="640" y="310" class="t-tiny">la review aggiorna il product backlog (e il release plan)</text>
+
+    <!-- Product backlog -->
+    <g class="hit" data-id="pb" tabindex="0">
+      <rect x="30" y="360" width="230" height="350" rx="14" class="box"/>
+      <text x="48" y="390" class="t-title">Product backlog</text>
+      <text x="48" y="410" class="t-tiny">lista ordinata per priorità</text>
+      <rect x="62" y="424" width="120" height="22" rx="4" class="card"/><text x="72" y="440" class="t-tiny">storia piccola</text>
+      <rect x="62" y="452" width="120" height="22" rx="4" class="card"/><text x="72" y="468" class="t-tiny">storia piccola</text>
+      <rect x="62" y="480" width="140" height="30" rx="4" class="card"/><text x="72" y="500" class="t-tiny">feature</text>
+      <rect x="62" y="516" width="160" height="42" rx="4" class="card"/><text x="72" y="542" class="t-tiny">feature più grande</text>
+      <rect x="62" y="564" width="180" height="58" rx="4" class="card"/><text x="72" y="598" class="t-tiny">epic (vaga, lontana)</text>
+      <text x="196" y="440" class="t-tiny" style="font-weight:700">↑</text>
+      <text x="48" y="646" class="t-small">In alto: piccolo e dettagliato</text>
+      <text x="48" y="664" class="t-small">In basso: grande e vago (DEEP)</text>
+      <circle cx="58" cy="690" r="7" class="dot-po"/><circle cx="76" cy="690" r="7" class="dot-dev"/><circle cx="94" cy="690" r="7" class="dot-st"/>
+      <text x="108" y="694" class="t-tiny">li gestisce il PO</text>
+    </g>
+    <g class="hit" data-id="groom" tabindex="0">
+      <path d="M236 470 C292 470 292 560 236 560" class="arrow" style="stroke:var(--po)" marker-end="url(#ah)"/>
+      <rect x="208" y="736" width="150" height="58" rx="10" class="card"/>
+      <text x="222" y="760" class="t-strong" style="fill:var(--po)">Grooming</text>
+      <text x="222" y="780" class="t-tiny">raffina, stima, ordina</text>
+      <path d="M260 560 C300 640 290 700 283 734" class="arrow-soft" marker-end="url(#ahs)"/>
+    </g>
+
+    <!-- arrow backlog -> planning -->
+    <path d="M262 470 L318 470" class="arrow" marker-end="url(#ah)"/>
+    <text x="268" y="460" class="t-tiny">item ready (DoR)</text>
+
+    <!-- Sprint planning -->
+    <g class="hit" data-id="splan" tabindex="0">
+      <rect x="322" y="390" width="190" height="170" rx="14" class="box"/>
+      <text x="340" y="420" class="t-title">Sprint planning</text>
+      <text x="340" y="444" class="t-small">Cosa facciamo?</text>
+      <text x="340" y="462" class="t-small">Come lo facciamo?</text>
+      <text x="340" y="490" class="t-tiny">usa velocity e capacity</text>
+      <text x="340" y="508" class="t-tiny">4-8 ore (sprint 2-4 sett.)</text>
+      <circle cx="346" cy="538" r="7" class="dot-po"/><circle cx="364" cy="538" r="7" class="dot-sm"/><circle cx="382" cy="538" r="7" class="dot-dev"/>
+    </g>
+    <path d="M514 470 L552 470" class="arrow" marker-end="url(#ah)"/>
+
+    <!-- Sprint backlog + goal -->
+    <g class="hit" data-id="sb" tabindex="0">
+      <rect x="556" y="390" width="170" height="170" rx="14" class="box"/>
+      <text x="572" y="420" class="t-title">Sprint backlog</text>
+      <rect x="574" y="434" width="64" height="20" rx="3" class="card"/><rect x="644" y="434" width="64" height="20" rx="3" class="card"/>
+      <rect x="574" y="460" width="64" height="20" rx="3" class="card"/><rect x="644" y="460" width="64" height="20" rx="3" class="card"/>
+      <text x="574" y="502" class="t-tiny">item scelti + task in ore</text>
+      <path d="M576 520 L576 548 M576 520 L604 527 L576 534" style="stroke:var(--sprint);stroke-width:2.5;fill:var(--sprint)"/>
+      <text x="612" y="540" class="t-strong" style="fill:var(--sprint)">Sprint goal</text>
+    </g>
+    <g class="hit" data-id="goal" tabindex="0"><rect x="566" y="516" width="150" height="34" rx="6" fill="transparent"/></g>
+    <path d="M728 470 L752 470" class="arrow" marker-end="url(#ah)"/>
+
+    <!-- Sprint circle -->
+    <g class="hit" data-id="sprint" tabindex="0">
+      <circle cx="925" cy="490" r="168" class="box" style="stroke:var(--sprint);stroke-width:3"/>
+      <text x="925" y="352" text-anchor="middle" class="t-big" style="fill:var(--sprint)">SPRINT</text>
+      <text x="925" y="374" text-anchor="middle" class="t-tiny">1-4 settimane (di solito 2)</text><text x="925" y="390" text-anchor="middle" class="t-tiny">stessa durata, goal fisso</text>
+    </g>
+    <g class="hit" data-id="sexec" tabindex="0">
+      <rect x="805" y="420" width="200" height="140" rx="12" class="card"/>
+      <text x="820" y="446" class="t-strong">Sprint execution</text>
+      <text x="820" y="464" class="t-tiny">~8 giorni su 10: si costruisce</text>
+      <rect x="820" y="474" width="56" height="56" rx="4" class="box"/><rect x="880" y="474" width="56" height="56" rx="4" class="box"/><rect x="940" y="474" width="56" height="56" rx="4" class="box"/>
+      <text x="826" y="487" class="t-tiny" style="font-size:10px">To do</text><text x="884" y="487" class="t-tiny" style="font-size:10px">Doing</text><text x="946" y="487" class="t-tiny" style="font-size:10px">Done</text>
+      <rect x="826" y="494" width="22" height="12" fill="var(--st)" opacity=".75"/><rect x="852" y="510" width="18" height="12" fill="var(--st)" opacity=".75"/>
+      <rect x="888" y="496" width="22" height="12" fill="var(--dev)" opacity=".75"/>
+      <rect x="946" y="494" width="22" height="12" fill="var(--sm)" opacity=".75"/><rect x="972" y="510" width="18" height="12" fill="var(--sm)" opacity=".75"/>
+      <circle cx="826" cy="545" r="7" class="dot-dev"/><circle cx="844" cy="545" r="7" class="dot-sm"/><circle cx="862" cy="545" r="7" class="dot-po"/>
+      <text x="876" y="549" class="t-tiny">task board</text>
+    </g>
+    <g class="hit" data-id="daily" tabindex="0">
+      <circle cx="1020" cy="610" r="44" class="card" style="stroke:var(--sprint)"/>
+      <path d="M990 578 A44 44 0 1 1 980 600" class="arrow" style="stroke:var(--sprint)" marker-end="url(#ah)"/>
+      <text x="1020" y="604" text-anchor="middle" class="t-strong" style="font-size:13px">Daily scrum</text>
+      <text x="1020" y="620" text-anchor="middle" class="t-tiny">ogni 24 h</text>
+      <text x="1020" y="634" text-anchor="middle" class="t-tiny">15 minuti</text>
+    </g>
+    <g class="hit" data-id="burn" tabindex="0">
+      <rect x="815" y="580" width="120" height="70" rx="8" class="card"/>
+      <path d="M827 592 L827 640 L925 640" style="stroke:var(--muted);fill:none;stroke-width:1.2"/>
+      <path d="M829 596 L923 638" style="stroke:var(--muted);fill:none;stroke-dasharray:3 3"/>
+      <path d="M829 596 L850 606 L866 604 L884 620 L902 626 L920 636" style="stroke:var(--sprint);fill:none;stroke-width:2"/>
+      <text x="836" y="660" class="t-tiny" style="font-size:11px">burndown</text>
+    </g>
+
+    <!-- arrow sprint -> increment -->
+    <path d="M1094 490 L1128 490" class="arrow" marker-end="url(#ah)"/>
+
+    <!-- Increment + DoD -->
+    <g class="hit" data-id="inc" tabindex="0">
+      <rect x="1132" y="400" width="130" height="180" rx="14" class="box"/>
+      <text x="1146" y="428" class="t-title">Increment</text>
+      <rect x="1158" y="442" width="78" height="56" rx="6" style="fill:var(--sprint);opacity:.85"/>
+      <path d="M1197 442 L1197 498 M1158 466 L1236 466" style="stroke:var(--paper);stroke-width:5"/>
+      <text x="1146" y="520" class="t-tiny">potenzialmente</text>
+      <text x="1146" y="536" class="t-tiny">rilasciabile</text>
+    </g>
+    <g class="hit" data-id="dod" tabindex="0">
+      <rect x="1138" y="546" width="118" height="26" rx="6" class="card" style="stroke:var(--dev)"/>
+      <text x="1197" y="564" text-anchor="middle" class="t-tiny" style="font-weight:700;fill:var(--dev);font-size:11px">✓ Definition of Done</text>
+    </g>
+
+    <path d="M1264 450 L1290 410" class="arrow" marker-end="url(#ah)"/>
+    <!-- Review -->
+    <g class="hit" data-id="review" tabindex="0">
+      <rect x="1282" y="360" width="100" height="150" rx="14" class="box" style="stroke:var(--st)"/>
+      <text x="1294" y="386" class="t-strong">Sprint</text>
+      <text x="1294" y="404" class="t-strong">review</text>
+      <text x="1294" y="426" class="t-tiny">ispeziona</text>
+      <text x="1294" y="442" class="t-tiny">il PRODOTTO</text>
+      <text x="1294" y="460" class="t-tiny">demo, feedback</text>
+      <circle cx="1298" cy="490" r="6" class="dot-po"/><circle cx="1314" cy="490" r="6" class="dot-sm"/><circle cx="1330" cy="490" r="6" class="dot-dev"/><circle cx="1346" cy="490" r="6" class="dot-st"/>
+    </g>
+    <path d="M1332 512 L1332 536" class="arrow" marker-end="url(#ah)"/>
+    <!-- Retro -->
+    <g class="hit" data-id="retro" tabindex="0">
+      <rect x="1282" y="540" width="100" height="150" rx="14" class="box" style="stroke:var(--sm)"/>
+      <text x="1294" y="566" class="t-strong">Sprint</text>
+      <text x="1294" y="584" class="t-strong">retro-</text>
+      <text x="1294" y="602" class="t-strong">spective</text>
+      <text x="1294" y="624" class="t-tiny">ispeziona</text>
+      <text x="1294" y="640" class="t-tiny">il PROCESSO</text>
+      <circle cx="1298" cy="670" r="6" class="dot-po"/><circle cx="1314" cy="670" r="6" class="dot-sm"/><circle cx="1330" cy="670" r="6" class="dot-dev"/>
+    </g>
+
+    <!-- next sprint loop -->
+    <path d="M1332 692 C1332 760 1200 770 900 770 C600 770 430 770 420 566" class="arrow" style="stroke:var(--sprint)" marker-end="url(#ah)"/>
+    <text x="760" y="792" class="t-strong" style="fill:var(--sprint)">↻ si ricomincia: sprint planning del prossimo sprint</text>
+    <text x="760" y="810" class="t-tiny">le azioni della retrospective entrano nel prossimo sprint backlog</text>
+
+    </g>
+<g class="hit" data-id="cap" tabindex="0"><rect x="452" y="1342" width="160" height="100" rx="12" class="card"/>
+<text x="468" y="1370" class="t-strong">Capacity</text>
+<text x="468" y="1392" class="t-small">ore disponibili</text>
+<text x="468" y="1409" class="t-small">− ferie − eventi</text>
+<text x="468" y="1426" class="t-small">− buffer</text>
+<text x="468" y="1443" class="t-small">forecast o commit</text>
+</g>
+<g class="hit" data-id="abterm" tabindex="0"><rect x="628" y="1342" width="168" height="100" rx="12" class="card"/>
+<text x="644" y="1370" class="t-strong" style="fill:var(--po)">Abnormal termination</text>
+<text x="644" y="1392" class="t-small">goal inutile:</text>
+<text x="644" y="1409" class="t-small">decide il PO</text>
+<text x="644" y="1426" class="t-small">ultima risorsa,</text>
+<text x="644" y="1443" class="t-small">poi nuovo planning</text>
+</g>
+<g class="hit" data-id="dor" tabindex="0"><rect x="30" y="1532" width="172" height="58" rx="12" class="card"/>
+<text x="46" y="1560" class="t-strong">Definition of Ready</text>
+</g>
+<text x="30" y="1610" class="t-sec">6 · STIMARE E MISURARE</text>
+<g class="hit" data-id="est" tabindex="0"><rect x="30" y="1626" width="330" height="210" rx="12" class="box"/>
+<text x="46" y="1654" class="t-strong">Stima</text>
+<text x="46" y="1676" class="t-small">Come team, non sono impegni,</text>
+<text x="46" y="1694" class="t-small">accurata ma non precisa, relativa</text>
+<text x="46" y="1712" class="t-small">Portfolio: T-shirt (S, M, L, XL)</text>
+<text x="46" y="1730" class="t-small">PBI: story points o ideal days</text>
+<text x="46" y="1748" class="t-small">Task: ore ideali</text>
+<text x="46" y="1766" class="t-small">Ideal day ≠ giorno di calendario</text>
+</g>
+<g class="hit" data-id="poker" tabindex="0"><rect x="380" y="1626" width="300" height="210" rx="12" class="box"/>
+<text x="396" y="1654" class="t-strong">Planning poker</text>
+<text x="396" y="1676" class="t-small">PO legge → domande → carta</text>
+<text x="396" y="1694" class="t-small">privata → si scoprono insieme</text>
+<text x="396" y="1712" class="t-small">→ spiegano il più alto e il più</text>
+<text x="396" y="1730" class="t-small">basso → si rigioca</text>
+<text x="396" y="1748" class="t-small">Consenso, mai la media</text>
+</g>
+<rect x="396" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="407" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">1</text>
+<rect x="421" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="432" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">2</text>
+<rect x="446" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="457" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">3</text>
+<rect x="471" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="482" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">5</text>
+<rect x="496" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="507" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">8</text>
+<rect x="521" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="532" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">13</text>
+<rect x="546" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="557" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">20</text>
+<rect x="571" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="582" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">40</text>
+<rect x="596" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="607" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">100</text>
+<rect x="621" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="632" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">?</text>
+<rect x="646" y="1788" width="22" height="30" rx="3" class="card" style="pointer-events:none"/><text x="657" y="1808" text-anchor="middle" class="t-tiny" style="font-weight:700;pointer-events:none;font-size:10.5px">∞</text>
+<g class="hit" data-id="vel" tabindex="0"><rect x="700" y="1626" width="320" height="210" rx="12" class="box"/>
+<text x="716" y="1654" class="t-strong">Velocity</text>
+<text x="716" y="1676" class="t-small">Punti degli item COMPLETATI</text>
+<text x="716" y="1694" class="t-small">(a metà = 0), come range: 18-22</text>
+<text x="716" y="1712" class="t-small">Output, non valore</text>
+<text x="716" y="1730" class="t-small">Non misura le prestazioni</text>
+<text x="716" y="1748" class="t-small">(rischio: point inflation)</text>
+</g>
+<rect x="720" y="1788" width="22" height="28" fill="var(--dev)" opacity=".65" style="pointer-events:none"/>
+<rect x="750" y="1770" width="22" height="46" fill="var(--dev)" opacity=".65" style="pointer-events:none"/>
+<rect x="780" y="1778" width="22" height="38" fill="var(--dev)" opacity=".65" style="pointer-events:none"/>
+<rect x="810" y="1764" width="22" height="52" fill="var(--dev)" opacity=".65" style="pointer-events:none"/>
+<rect x="840" y="1772" width="22" height="44" fill="var(--dev)" opacity=".65" style="pointer-events:none"/>
+<g class="hit" data-id="relcalc" tabindex="0"><rect x="1040" y="1626" width="330" height="210" rx="12" class="box"/>
+<text x="1056" y="1654" class="t-strong">Fixed date e fixed scope</text>
+<text x="1056" y="1676" class="t-small">Fixed date: la data non cambia</text>
+<text x="1056" y="1694" class="t-small">  will-have = vel. lenta × sprint</text>
+<text x="1056" y="1712" class="t-small">  might-have = vel. veloce × sprint</text>
+<text x="1056" y="1730" class="t-small">Fixed scope: lo scope non cambia</text>
+<text x="1056" y="1748" class="t-small">  sprint = punti / vel. (veloce→min,</text>
+<text x="1056" y="1766" class="t-small">  lenta→max). 150 pt, 18-22 → 7-9</text>
+</g>
+<g class="hit" data-id="charts" tabindex="0"><rect x="30" y="1854" width="650" height="120" rx="12" class="box"/>
+<text x="46" y="1882" class="t-strong">Grafici di release</text>
+<text x="46" y="1904" class="t-small">Burndown: lavoro che RESTA nella release (cala di una velocity per sprint)</text>
+<text x="46" y="1922" class="t-small">Burnup: lavoro COMPLETATO che sale verso il target (meglio se lo scope cambia)</text>
+<text x="46" y="1940" class="t-small">Fixed date: burnup con le linee will-have / might-have / must-have</text>
+</g>
+<g class="hit" data-id="burn" tabindex="0"><rect x="700" y="1854" width="670" height="120" rx="12" class="box"/>
+<text x="716" y="1882" class="t-strong">Grafici di sprint</text>
+<text x="716" y="1904" class="t-small">Sprint burndown: ore rimanenti dei task, ogni giorno (sopra la linea = ritardo)</text>
+<text x="716" y="1922" class="t-small">Sprint burnup: punti degli item finiti; piatto per giorni = troppi item in corso</text>
+<text x="716" y="1940" class="t-small">Task board: to do, in progress, done</text>
+</g>
+<text x="30" y="2000" class="t-sec">7 · QUALITÀ E TECHNICAL DEBT</text>
+<g class="hit" data-id="debt" tabindex="0"><rect x="30" y="2016" width="330" height="210" rx="12" class="box"/>
+<text x="46" y="2044" class="t-strong">Technical debt</text>
+<text x="46" y="2066" class="t-small">Cunningham: scorciatoie = debito,</text>
+<text x="46" y="2084" class="t-small">tempo perso = interessi</text>
+<text x="46" y="2102" class="t-small">Naive: immaturità del team</text>
+<text x="46" y="2120" class="t-small">Unavoidable: imprevedibile</text>
+<text x="46" y="2138" class="t-small">Strategic: scelta consapevole</text>
+<text x="46" y="2156" class="t-small">Cresce in modo non lineare</text>
+</g>
+<g class="hit" data-id="dcons" tabindex="0"><rect x="380" y="2016" width="300" height="210" rx="12" class="box"/>
+<text x="396" y="2044" class="t-strong">Conseguenze e cause</text>
+<text x="396" y="2066" class="t-small">Tipping point imprevedibile</text>
+<text x="396" y="2084" class="t-small">Velocity più bassa, più difetti</text>
+<text x="396" y="2102" class="t-small">Costi in salita, meno prevedibilità</text>
+<text x="396" y="2120" class="t-small">Cause: scadenze, voler accelerare,</text>
+<text x="396" y="2138" class="t-small">il mito «meno test = più veloce»</text>
+</g>
+<g class="hit" data-id="dman" tabindex="0"><rect x="700" y="2016" width="320" height="210" rx="12" class="box"/>
+<text x="716" y="2044" class="t-strong">Gestire il debito</text>
+<text x="716" y="2066" class="t-small">1. Limitarne l&#x27;accumulo: pratiche,</text>
+<text x="716" y="2084" class="t-small">   DoD forte, economia del debito</text>
+<text x="716" y="2102" class="t-small">2. Renderlo visibile: nel backlog</text>
+<text x="716" y="2120" class="t-small">3. Ripagarlo: happened-upon →</text>
+<text x="716" y="2138" class="t-small">   known → targeted; boy scout rule;</text>
+<text x="716" y="2156" class="t-small">   prima l&#x27;interesse alto</text>
+</g>
+<g class="hit" data-id="dod" tabindex="0"><rect x="1040" y="2016" width="330" height="210" rx="12" class="box"/>
+<text x="1056" y="2044" class="t-strong">Done = DoD + criteri</text>
+<text x="1056" y="2066" class="t-small">Definition of Done: per TUTTI</text>
+<text x="1056" y="2084" class="t-small">  gli item (testato, integrato…)</text>
+<text x="1056" y="2102" class="t-small">Acceptance criteria: di UN item,</text>
+<text x="1056" y="2120" class="t-small">  li scrive il PO</text>
+<text x="1056" y="2138" class="t-small">Non done? torna nel backlog</text>
+<text x="1056" y="2156" class="t-small">DoD debole → debito tecnico</text>
+</g>
+<text x="30" y="2252" class="t-small" >Buone pratiche tecniche (limitano il debito, usate durante la sprint execution): TDD, continuous integration, test automatici, refactoring, simple design, pair programming, proprietà collettiva del codice.</text>
+<text x="30" y="2290" class="t-sec">8 · LABORATORIO 1: CI/CD, COME OGNI COMMIT DIVENTA RILASCIABILE</text>
+<g class="hit" data-id="pipe" tabindex="0"><rect x="30" y="2306" width="1340" height="130" rx="12" class="box" style="stroke:var(--sm);stroke-width:2"/>
+<text x="46" y="2334" class="t-strong" >Deployment pipeline (costruita sopra un walking skeleton): ciò che sopravvive è rilasciabile</text>
+<rect x="46" y="2352" width="170" height="42" rx="8" class="card"/><text x="58" y="2378" class="t-small">commit (trunk)</text>
+<path d="M218 2373 L238 2373" class="arrow" marker-end="url(#ah)"/>
+<rect x="242" y="2352" width="290" height="42" rx="8" class="card"/><text x="254" y="2378" class="t-small">commit stage: build + unit test</text>
+<path d="M534 2373 L554 2373" class="arrow" marker-end="url(#ah)"/>
+<rect x="558" y="2352" width="210" height="42" rx="8" class="card"/><text x="570" y="2378" class="t-small">artifact repository</text>
+<path d="M770 2373 L790 2373" class="arrow" marker-end="url(#ah)"/>
+<rect x="794" y="2352" width="290" height="42" rx="8" class="card"/><text x="806" y="2378" class="t-small">acceptance stage: end-to-end</text>
+<path d="M1086 2373 L1106 2373" class="arrow" marker-end="url(#ah)"/>
+<rect x="1110" y="2352" width="230" height="42" rx="8" class="card"/><text x="1122" y="2378" class="t-small">deploy + smoke test</text>
+<text x="46" y="2420" class="t-small" >Continuous integration → continuous delivery (sempre rilasciabile, deploy manuale) → continuous deployment (anche il deploy è automatico)</text>
+</g>
+<g class="hit" data-id="trunk" tabindex="0"><rect x="30" y="2454" width="260" height="180" rx="12" class="box"/>
+<text x="46" y="2482" class="t-strong">Trunk-based development</text>
+<rect x="246" y="2466" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="252" y="2479" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="46" y="2504" class="t-small">Rami lunghi = conflitti</text>
+<text x="46" y="2522" class="t-small">Commit sul trunk o rami</text>
+<text x="46" y="2540" class="t-small">brevissimi (merge ogni giorno)</text>
+<text x="46" y="2558" class="t-small">Branch protection + PR</text>
+<text x="46" y="2576" class="t-small">+ check + code review</text>
+</g>
+<g class="hit" data-id="git" tabindex="0"><rect x="300" y="2454" width="260" height="180" rx="12" class="box"/>
+<text x="316" y="2482" class="t-strong">Git e GitHub</text>
+<rect x="516" y="2466" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="522" y="2479" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="316" y="2504" class="t-small">commit = istantanea</text>
+<text x="316" y="2522" class="t-small">branch = etichetta</text>
+<text x="316" y="2540" class="t-small">merge, conflict, push, pull</text>
+<text x="316" y="2558" class="t-small">Git ≠ GitHub (PR, issues,</text>
+<text x="316" y="2576" class="t-small">protection, Actions)</text>
+</g>
+<g class="hit" data-id="gha" tabindex="0"><rect x="570" y="2454" width="270" height="180" rx="12" class="box"/>
+<text x="586" y="2482" class="t-strong">GitHub Actions + Makefile</text>
+<rect x="796" y="2466" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="802" y="2479" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="586" y="2504" class="t-small">workflow → job → step</text>
+<text x="586" y="2522" class="t-small">runner (runs-on), needs</text>
+<text x="586" y="2540" class="t-small">on: push, pull_request</text>
+<text x="586" y="2558" class="t-small">YAML = quando e dove</text>
+<text x="586" y="2576" class="t-small">Makefile = cosa (make check)</text>
+</g>
+<g class="hit" data-id="disc" tabindex="0"><rect x="850" y="2454" width="250" height="180" rx="12" class="box"/>
+<text x="866" y="2482" class="t-strong">Disciplina e hooks</text>
+<rect x="1056" y="2466" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="1062" y="2479" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="866" y="2504" class="t-small">pull prima di push</text>
+<text x="866" y="2522" class="t-small">test in locale, trunk verde</text>
+<text x="866" y="2540" class="t-small">rompi? sistemi o revert</text>
+<text x="866" y="2558" class="t-small">pre-commit, commit-msg,</text>
+<text x="866" y="2576" class="t-small">pre-push</text>
+</g>
+<g class="hit" data-id="flags" tabindex="0"><rect x="1110" y="2454" width="260" height="180" rx="12" class="box"/>
+<text x="1126" y="2482" class="t-strong">Feature flags e BbA</text>
+<rect x="1326" y="2466" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="1332" y="2479" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="1126" y="2504" class="t-small">Codice nuovo e vecchio</text>
+<text x="1126" y="2522" class="t-small">convivono (un if)</text>
+<text x="1126" y="2540" class="t-small">Branch by abstraction:</text>
+<text x="1126" y="2558" class="t-small">interfaccia, poi sostituisci</text>
+<text x="1126" y="2576" class="t-small">Troppi flag = debito</text>
+</g>
+<text x="30" y="2660" class="t-sec">9 · LABORATORIO 2: SOFTWARE TESTING</text>
+<g class="hit" data-id="scope" tabindex="0"><rect x="30" y="2676" width="300" height="220" rx="12" class="box"/>
+<text x="46" y="2704" class="t-strong">Piramide dei test</text>
+<rect x="286" y="2688" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="292" y="2701" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="46" y="2726" class="t-small"></text>
+<text x="46" y="2744" class="t-small"></text>
+<text x="46" y="2762" class="t-small"></text>
+<text x="46" y="2780" class="t-small"></text>
+<text x="46" y="2798" class="t-small"></text>
+<text x="46" y="2816" class="t-small">Unit: molti, veloci</text>
+<text x="46" y="2834" class="t-small">Integration: meno</text>
+<text x="46" y="2852" class="t-small">End-to-end: pochi, lenti</text>
+</g>
+<path d="M180 2704 L250 2786 L110 2786 Z" style="fill:var(--dev);opacity:.25;pointer-events:none"/><path d="M180 2704 L250 2786 L110 2786 Z M157 2731 L203 2731 M133 2759 L227 2759" style="fill:none;stroke:var(--dev);stroke-width:1.5;pointer-events:none"/>
+<text x="166" y="2726" class="t-tiny" style="pointer-events:none">E2E</text>
+<text x="160" y="2751" class="t-tiny" style="pointer-events:none">integr.</text>
+<text x="167" y="2779" class="t-tiny" style="pointer-events:none">unit</text>
+<g class="hit" data-id="box" tabindex="0"><rect x="350" y="2676" width="290" height="220" rx="12" class="box"/>
+<text x="366" y="2704" class="t-strong">Tipi e quadranti</text>
+<rect x="596" y="2688" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="602" y="2701" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="366" y="2726" class="t-small">Black-box / white-box</text>
+<text x="366" y="2744" class="t-small">Funzionali / non funzionali</text>
+<text x="366" y="2762" class="t-small">Manuali / automatici</text>
+<text x="366" y="2780" class="t-small">Quadranti: supportano il team</text>
+<text x="366" y="2798" class="t-small">(unit, acceptance) o criticano</text>
+<text x="366" y="2816" class="t-small">il prodotto (esplorativi, load,</text>
+<text x="366" y="2834" class="t-small">usabilità, demo in review)</text>
+</g>
+<g class="hit" data-id="inpipe" tabindex="0"><rect x="660" y="2676" width="260" height="220" rx="12" class="box"/>
+<text x="676" y="2704" class="t-strong">Test nella pipeline</text>
+<rect x="876" y="2688" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="882" y="2701" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="676" y="2726" class="t-small">Commit stage: unit,</text>
+<text x="676" y="2744" class="t-small">integration (minuti)</text>
+<text x="676" y="2762" class="t-small">Acceptance: end-to-end</text>
+<text x="676" y="2780" class="t-small">Altri gate: load, manuali</text>
+<text x="676" y="2798" class="t-small">Dopo il deploy: smoke test</text>
+<text x="676" y="2816" class="t-small">Chi testa? lo Scrum team</text>
+</g>
+<g class="hit" data-id="tdd" tabindex="0"><rect x="940" y="2676" width="220" height="220" rx="12" class="box"/>
+<text x="956" y="2704" class="t-strong">TDD</text>
+<rect x="1116" y="2688" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="1122" y="2701" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="956" y="2726" class="t-small"></text>
+<text x="956" y="2744" class="t-small"></text>
+<text x="956" y="2762" class="t-small"></text>
+<text x="956" y="2780" class="t-small"></text>
+<text x="956" y="2798" class="t-small"></text>
+<text x="956" y="2816" class="t-small"></text>
+<text x="956" y="2834" class="t-small">Codice solo se un test</text>
+<text x="956" y="2852" class="t-small">fallisce; elimina duplicati</text>
+<text x="956" y="2870" class="t-small">Non è una religione</text>
+</g>
+<g style="pointer-events:none"><circle cx="1014" cy="2734" r="18" style="fill:#d64545"/><circle cx="1086" cy="2734" r="18" style="fill:#2e9e5b"/><circle cx="1050" cy="2774" r="18" style="fill:var(--accent)"/>
+<text x="1014" y="2738" text-anchor="middle" class="t-tiny" style="fill:#fff;font-weight:700">red</text><text x="1086" y="2738" text-anchor="middle" class="t-tiny" style="fill:#fff;font-weight:700">green</text><text x="1050" y="2778" text-anchor="middle" class="t-tiny" style="fill:#fff;font-weight:700;font-size:9.5px">refactor</text></g>
+<g class="hit" data-id="good" tabindex="0"><rect x="1180" y="2676" width="190" height="220" rx="12" class="box"/>
+<text x="1196" y="2704" class="t-strong">Buoni test</text>
+<rect x="1326" y="2688" width="32" height="18" rx="4" style="fill:var(--sm);opacity:.18"/><text x="1332" y="2701" class="t-tiny" style="fill:var(--sm);font-family:var(--font-mono);font-size:11px">lab</text>
+<text x="1196" y="2726" class="t-small">Deve poter fallire</text>
+<text x="1196" y="2744" class="t-small">Input che distinguono</text>
+<text x="1196" y="2762" class="t-small">Isolati, AAA</text>
+<text x="1196" y="2780" class="t-small">Bug → regression test</text>
+<text x="1196" y="2798" class="t-small">Niente test, niente</text>
+<text x="1196" y="2816" class="t-small">refactoring</text>
+<text x="1196" y="2834" class="t-small">Fixture, pytest</text>
+</g>
+  </svg>
+  </div>
+  <section class="panel" id="panel" aria-live="polite" hidden></section>
+</div>
+<script>
+const P = { po: ["Product owner", "var(--po)"], sm: ["ScrumMaster", "var(--sm)"], dev: ["Developers", "var(--dev)"], st: ["Stakeholder", "var(--st)"] };
+const D = {
+  stake: { k: "Persone", t: "Stakeholder", p: ["Tutti quelli che hanno interesse nel prodotto ma non fanno parte dello Scrum team: clienti, utenti, partner, manager, vendite, marketing, supporto, altri team.", "Danno input al product owner per il backlog e soprattutto feedback nella sprint review. Nella retrospective entrano solo se invitati. Nel daily scrum sono «chickens»: coinvolti ma non impegnati, quindi non parlano."], who: ["st"], io: [["Dove", "Sprint review, grooming del backlog (input al PO)"]] },
+  team: { k: "Persone", t: "Scrum team", p: ["Product owner, ScrumMaster e developers. È cross-functional (ha tutte le competenze per creare valore in ogni sprint) e auto-organizzato, senza sotto-team né gerarchie.", "È responsabile di tutto il prodotto, compresi verifica e test (lab 2)."], who: ["po", "sm", "dev"], io: [["Tre ruoli", "Cosa (PO), come (developers), il processo (ScrumMaster)"]] },
+  po: { k: "Persone", t: "Product owner", p: ["Il punto centrale della leadership di prodotto: decide cosa costruire e in che ordine, ed è responsabile del successo del prodotto.", "Crea e ordina il product backlog e guida il grooming; nello sprint planning propone il goal iniziale e spiega gli item, ma non impone quanto fare; durante l'execution risponde alle domande e verifica gli acceptance criteria; nella review presenta cosa è stato fatto. È l'unico che può terminare uno sprint in anticipo."], who: ["po"], io: [["Possiede", "Product backlog, priorità, acceptance criteria"], ["Non fa", "Non dice ai developers come lavorare"]] },
+  sm: { k: "Persone", t: "ScrumMaster", p: ["Un leader, non un manager: coach e facilitatore che aiuta il team a capire e seguire Scrum.", "Rimuove gli impedimenti emersi nel daily scrum, protegge il team dalle interferenze esterne, facilita planning, review e retrospective (dove è la process authority)."], who: ["sm"], io: [["Possiede", "Il processo"], ["Non fa", "Non assegna i task e non decide l'impegno del team"]] },
+  dev: { k: "Persone", t: "Developers (development team)", p: ["Decidono come trasformare gli item in un increment funzionante. Di solito da 5 a 9 persone, che insieme hanno tutte le competenze necessarie.", "Stimano gli item (planning poker), decidono quanto lavoro è realistico, scompongono gli item in task, si auto-organizzano durante l'execution, si sincronizzano nel daily scrum e rispettano la Definition of Done."], who: ["dev"], io: [["Possiedono", "Sprint backlog, stime, il come"]] },
+  pb: { k: "Artefatto", t: "Product backlog", p: ["La lista ordinata di tutto ciò che serve al prodotto: feature, modifiche, difetti, miglioramenti tecnici, attività di studio. Gli elementi sono i PBI, spesso scritti come user story: «As a <ruolo>, I want <obiettivo> so that <beneficio>».", "Deve essere DEEP: dettagliato quanto serve (in alto piccolo e preciso, in basso grande e vago), emergente, stimato, ordinato. Un prodotto, un backlog."], who: ["po", "dev", "st"], io: [["Gestito da", "Product owner"], ["Va verso", "Sprint planning (gli item ready in cima)"], ["Torna da", "Sprint review (feedback)"]] },
+  groom: { k: "Attività continua", t: "Grooming (refinement)", p: ["Tiene il backlog in forma: si creano e raffinano gli item (dividendo le epic in feature e storie), si stimano, si ordinano. Lo guida il product owner con developers e stakeholder; il team ci dedica fino al 10% del suo tempo in ogni sprint.", "Porta gli item in cima allo stato ready (Definition of Ready): valore chiaro, dettagli capiti, stimati, abbastanza piccoli per uno sprint, acceptance criteria testabili."], who: ["po", "dev", "st"], io: [["Quando", "Durante tutto lo sprint, non è un evento a parte"]] },
+  splan: { k: "Evento", t: "Sprint planning", p: ["Apre ogni sprint. Il team concorda lo sprint goal e sceglie dalla cima del backlog gli item che può finire a ritmo sostenibile (cosa), poi li scompone in task stimati in ore (come) per verificare che il piano sia realistico.", "Si controlla l'impegno con la velocity (punti degli sprint passati) e la capacity (ore disponibili meno ferie e altre attività, con un margine)."], who: ["po", "sm", "dev"], io: [["Input", "Product backlog ready, velocity, capacity, vincoli, goal iniziale del PO"], ["Output", "Sprint goal e sprint backlog"], ["Durata", "4-8 ore per sprint di 2-4 settimane"]] },
+  sb: { k: "Artefatto", t: "Sprint backlog", p: ["Gli item scelti per lo sprint più il piano per realizzarli: i task, stimati in ore. Appartiene ai developers, che lo aggiornano ogni giorno.", "Si vede sulla task board (to do, in progress, done) e si segue con lo sprint burndown."], who: ["dev"], io: [["Nasce in", "Sprint planning"], ["Usato in", "Sprint execution e daily scrum"]] },
+  goal: { k: "Artefatto", t: "Sprint goal", p: ["Lo scopo di business dello sprint, in una frase (per esempio «un utente tipico può fare una ricerca per parola chiave»).", "È un impegno reciproco: i developers si impegnano a raggiungerlo, il product owner a non cambiarlo durante lo sprint. Si può chiarire, non cambiare. Se diventa del tutto inutile, il PO può terminare lo sprint (abnormal termination, ultima risorsa)."], who: ["po", "dev"], io: [["Nasce in", "Sprint planning"]] },
+  sprint: { k: "Contenitore", t: "Sprint", p: ["È il modo in cui Scrum divide il lavoro: un'iterazione timeboxed, al massimo un mese, di solito due settimane, sempre della stessa durata (cadence). Contiene tutti gli eventi: planning, execution con i daily scrum, review e retrospective.", "Regole: date fisse di inizio e fine, nessun cambiamento che alteri il goal, alla fine un increment che rispetta la Definition of Done. Combina sviluppo iterativo e incrementale: ogni sprint fa analisi, design, sviluppo e test di poche funzionalità, non una fase sola (niente WaterScrum)."], who: ["po", "sm", "dev"], io: [["Durata", "1-4 settimane, costante"], ["Produce", "Un increment potenzialmente rilasciabile"]] },
+  sexec: { k: "Evento", t: "Sprint execution", p: ["La parte principale dello sprint (circa 8 giorni su 10): i developers si auto-organizzano per raggiungere il goal e trasformare gli item in funzionalità funzionanti e testate.", "Lavorano su pochi item alla volta e li finiscono (swarming): un item fatto al 90% vale zero. Usano buone pratiche tecniche (TDD, continuous integration, refactoring, pair programming). Lo ScrumMaster rimuove gli impedimenti, il PO risponde alle domande."], who: ["dev", "sm", "po"], io: [["Strumenti", "Task board, sprint burndown e burnup"], ["Produce", "L'increment"]] },
+  daily: { k: "Evento", t: "Daily scrum", p: ["Ogni giorno, alla stessa ora, al massimo 15 minuti, in piedi (daily stand-up). Ognuno risponde a tre domande: cosa ho fatto dall'ultimo daily, cosa farò fino al prossimo, quali impedimenti mi bloccano.", "È la pianificazione giornaliera del team, non un report a un manager. Gli impedimenti li prende in carico lo ScrumMaster."], who: ["dev", "sm"], io: [["Quando", "Ogni 24 ore durante l'execution"], ["Durata", "15 minuti al massimo"]] },
+  burn: { k: "Misura", t: "Sprint burndown", p: ["Ogni giorno, le ore stimate che restano per i task dello sprint. La linea tratteggiata è l'andamento ideale verso zero: sotto si è in anticipo, sopra in ritardo. Può risalire quando si scoprono nuovi task.", "Il burnup mostra invece i punti degli item completati: se resta piatto per giorni, ci sono troppi item in corso."], who: ["dev"], io: [["Si discute in", "Daily scrum"]] },
+  inc: { k: "Artefatto", t: "Increment", p: ["Il risultato di ogni sprint: un pezzo di prodotto potenzialmente rilasciabile, integrato e testato con tutto ciò che c'era prima. Si potrebbe consegnare se il business lo volesse.", "Un item entra nell'increment solo se rispetta la Definition of Done e i suoi acceptance criteria: altrimenti torna nel product backlog."], who: ["dev"], io: [["Prodotto da", "Sprint execution"], ["Ispezionato in", "Sprint review"]] },
+  dod: { k: "Regola di qualità", t: "Definition of Done", p: ["La descrizione concordata di quando un lavoro è davvero finito: per il software, progettato, costruito, integrato, testato e documentato. Vale per tutti gli item.", "Diversa dagli acceptance criteria, che sono specifici di un item e li scrive il PO: done significa rispettare entrambi. Una DoD debole crea debito tecnico. Nei laboratori: è la pipeline CI/CD con i test a verificarla."], who: ["dev", "po"], io: [["Collegata a", "Increment, acceptance criteria, pipeline, technical debt"]] },
+  review: { k: "Evento", t: "Sprint review", p: ["Ispeziona e adatta il prodotto. Lo Scrum team mostra l'increment agli stakeholder e si discute: piace? cosa cambiare? il prodotto ha ancora senso? Il PO fa l'overview (cosa è stato fatto e cosa no), i developers fanno la demo, poi discussione e adattamento.", "Informale, senza colpe, senza firme formali. Il risultato aggiorna il product backlog e il release plan."], who: ["po", "sm", "dev", "st"], io: [["Input", "L'increment"], ["Output", "Feedback, backlog aggiornato"], ["Durata", "Circa 1 ora per settimana di sprint (massimo 4)"]] },
+  retro: { k: "Evento", t: "Sprint retrospective", p: ["Ispeziona e adatta il processo, dopo la review: cosa ha funzionato e continuiamo, cosa smettiamo, cosa iniziamo o miglioriamo.", "Fasi: creare un'atmosfera sicura, condividere il contesto (event timeline, emotions seismograph), trovare gli insight, decidere le azioni votando (con un responsabile), chiudere. Le azioni entrano nel prossimo sprint backlog; gli spunti rimandati vanno nell'insight backlog."], who: ["po", "sm", "dev"], io: [["Partecipano", "Solo lo Scrum team; altri solo se invitati"], ["Durata", "Circa 1,5 ore per uno sprint di 2 settimane"]] },
+  est: { k: "Misura", t: "Stima e planning poker", p: ["Gli item del backlog si stimano in story points (dimensione relativa, non ore) o in ideal days. Si stima come team, le stime non sono impegni, contano accuratezza e non precisione.", "Planning poker: il PO legge l'item, si discute, ognuno sceglie una carta (1, 2, 3, 5, 8, 13, 20, 40, 100) e si scoprono insieme; se c'è disaccordo spiegano chi ha dato il valore più alto e il più basso, poi si rigioca fino al consenso."], who: ["dev", "po", "sm"], io: [["Quando", "Grooming e sprint planning"]] },
+  vel: { k: "Misura", t: "Velocity", p: ["La somma dei punti degli item completati in uno sprint; gli item non finiti contano zero. Meglio come intervallo (per esempio 18-22 punti).", "Serve a pianificare: quanti item nel prossimo sprint, quanti sprint per una release (150 punti con velocity 18-22 sono da 7 a 9 sprint). Non è una misura di produttività."], who: ["dev"], io: [["Usata in", "Sprint planning e release planning"]] },
+  pipe: { k: "Laboratorio 1", t: "Pipeline CI/CD", p: ["Durante la sprint execution i developers integrano il codice nel trunk più volte al giorno (continuous integration). Ogni commit attraversa la pipeline: il commit stage compila ed esegue gli unit test e produce una candidate release; l'artifact repository la conserva; l'acceptance stage la installa in un ambiente simile alla produzione ed esegue i test end-to-end; poi il deploy.", "Ciò che sopravvive alla pipeline è rilasciabile: è così che l'increment rispetta davvero la Definition of Done. Si implementa con GitHub Actions (workflow, job, step) e un Makefile; i rami restano brevi (trunk-based development)."], who: ["dev"], io: [["Continuous delivery", "Sempre rilasciabile, deploy manuale"], ["Continuous deployment", "Anche il deploy è automatico"]] },
+};
+
+Object.assign(D, {
+  plan: { k: "Perché Scrum", t: "Plan-driven (waterfall)", p: ["Lo sviluppo tradizionale, detto anche sequenziale o predittivo: si cerca di prevedere e pianificare tutto all'inizio, poi si procede per fasi complete (analisi, design, codice, test), con feedback solo alla fine.", "Funziona per problemi ben definiti, prevedibili e stabili. Le sue ipotesi (poca variabilità, passi ben definiti, feedback tardivo) falliscono nei domini complessi: per questo nasce Scrum."], who: [], io: [["Opposto di", "Scrum: iterativo, incrementale, adattivo"]] },
+  agile: { k: "Perché Scrum", t: "Agile Manifesto", p: ["Il manifesto del 2001 da cui vengono i principi di Scrum. Quattro valori: individui e interazioni più di processi e strumenti; software funzionante più di documentazione esaustiva; collaborazione con il cliente più di negoziazione dei contratti; rispondere al cambiamento più di seguire un piano.", "Nei laboratori si citano anche i principi 1 e 3: consegnare presto e in modo continuo software di valore; consegnare spesso, da poche settimane a pochi mesi, preferendo il periodo più breve. Il software funzionante è la misura principale del progresso."], who: [], io: [["Origine di", "Scrum, continuous delivery"]] },
+  princ: { k: "Perché Scrum", t: "Principi agili di Scrum", p: ["Variabilità e incertezza: accettare la variabilità utile; sviluppo iterativo (più passate) e incrementale (un pezzo alla volta); ispezione, adattamento e trasparenza; ridurre insieme le incertezze su cosa (end), come (means) e per chi (customer).", "Previsione e adattamento: tenere aperte le opzioni e decidere al last responsible moment; non si può fare tutto giusto all'inizio; cambiare in modo economicamente sensato. Validated learning: validare presto le ipotesi, più loop di feedback. WIP: batch piccoli, guardare il lavoro fermo e non le persone ferme, cost of delay. Progresso: ripianificare, misurare software funzionante. Performance: veloci ma senza fretta, qualità costruita dentro, cerimonia minima."], who: [], io: [["Anti-pattern", "WaterScrum: uno sprint per fase (analisi, design, codice, test)"]] },
+  cynefin: { k: "Perché Scrum", t: "Cynefin", p: ["Un modello per capire se Scrum è adatto al problema.", "Complesso (si capisce solo provando): Scrum è particolarmente adatto. Complicato (servono esperti): funziona. Semplice (procedura nota): non il più efficiente. Caotico (crisi): non adatto, bisogna agire subito. Lavoro guidato dalle interruzioni, come manutenzione e supporto: meglio Kanban."], who: [], io: [] },
+  portf: { k: "Livello 1 di pianificazione", t: "Portfolio planning", p: ["Il livello più alto, su un orizzonte di un anno o più: decide quali prodotti o progetti fare, in che ordine e per quanto tempo. Si ripete periodicamente anche per i prodotti già in corso (continuare, cambiare direzione o fermare).", "Strategie: marginal economics (investire solo finché conviene), un filtro economico per le nuove idee, bilanciare prodotti in entrata e in uscita, preferire release piccole e frequenti."], who: ["st", "po"], io: [["Output", "Portfolio backlog (stimato in T-shirt size)"], ["Alimenta", "Product planning"]] },
+  envis: { k: "Livello 2 di pianificazione", t: "Product planning (envisioning)", p: ["Trasforma un'idea, che ha passato il filtro strategico dell'organizzazione, in una visione del prodotto: dove gli stakeholder trovano valore.", "Produce un product backlog di alto livello (storie a livello di epic) e, se serve, una product roadmap: come il prodotto verrà costruito e consegnato a pezzi nel tempo, release fixed-scope o fixed-date."], who: ["po", "st"], io: [["Output", "Visione, product backlog iniziale (epic), roadmap"], ["Alimenta", "Release planning e product backlog"]] },
+  rel: { k: "Livello 3 di pianificazione", t: "Release planning", p: ["Decide il prossimo passo verso l'obiettivo del prodotto, su 3-9 mesi, facendo compromessi tra scope, data e budget. Avviene dopo l'envisioning e prima del primo sprint della release, e si aggiorna a ogni sprint review.", "Si stimano abbastanza item e si traccia una linea nel backlog: must have, nice to have, won't have. Indovinare il contenuto dei primi uno o due sprint è utile, oltre quasi mai. Release piccole e frequenti rendono di più: nell'esempio del corso IRR 9,1% per una release annuale contro 19,5% per release trimestrali."], who: ["po", "sm", "dev", "st"], io: [["Due tipi", "Fixed date (lo scope si adatta) o fixed scope (la data si adatta)"], ["Usa", "Velocity come range"]] },
+  splanlv: null, dailylv: null,
+  wshop: { k: "Requisiti", t: "Come nascono le storie", p: ["Chiedere agli utenti «cosa volete?» spesso non funziona: meglio coinvolgerli e far vedere spesso il prodotto.", "User-story-writing workshop: da qualche ora a qualche giorno, con PO, ScrumMaster, team e stakeholder; si identificano user role e personas (per esempio «Lilly») e si scrivono le card per la prossima release, non tutte. Story mapping: una vista bidimensionale del backlog, con le storie in ordine lungo il flusso delle attività dell'utente."], who: ["po", "dev", "st", "sm"], io: [] },
+  story: { k: "Requisiti", t: "User story", p: ["Il formato più comune per i PBI: «As a <ruolo>, I want <obiettivo> so that <beneficio>». Comprensibile da business e tecnici.", "Le tre C di Ron Jeffries: Card (poche frasi, non tutti i dettagli), Conversation (la card è la promessa di una conversazione: i dettagli si negoziano just in time), Confirmation (le condizioni di soddisfazione, cioè gli acceptance criteria, scritti dal PO e verificati con acceptance test)."], who: ["po", "dev"], io: [["Esempio", "As a wiki user I want to upload a file so that I can share it with my colleagues"]] },
+  invest: { k: "Requisiti", t: "INVEST", p: ["Le qualità di una buona user story: Independent (poche dipendenze), Negotiable (dettagli da negoziare), Valuable (valore per il cliente), Estimatable (si può stimare), Small (sta in uno sprint, pochi giorni), Testable (passa o fallisce i suoi test).", "Una storia troppo grande si divide lungo il valore (pagare con carta, con PayPal…), non lungo gli strati tecnici (database, back-end, front-end)."], who: [], io: [] },
+  levels: { k: "Requisiti", t: "Epic, feature, story, task", p: ["Etichette di comodo per la dimensione: epic (da qualche a molti mesi, una o più release), feature (settimane, troppo per uno sprint), sprintable story (giorni, sta in uno sprint), task (ore, il lavoro tecnico dentro lo sprint). Theme: un gruppo di storie collegate.", "Le epic stanno in fondo al backlog e si dividono man mano che si avvicinano (progressive refinement); i task nascono solo nello sprint planning."], who: [], io: [] },
+  pbitypes: { k: "Requisiti", t: "Tipi di product backlog item", p: ["Un PBI è qualsiasi lavoro con valore: feature, change (per esempio ordinare i risultati per cognome), defect, technical improvement (aggiornare il DBMS), knowledge acquisition (prototipi, spike, limitati nel tempo).", "I requisiti non funzionali (performance, sicurezza, usabilità) toccano quasi tutte le storie: si possono scrivere come card, ma vanno inseriti nella Definition of Done."], who: ["po"], io: [] },
+  dor: { k: "Backlog", t: "Definition of Ready", p: ["La checklist che un item in cima al backlog deve rispettare per entrare nello sprint planning: valore chiaro, dettagli capiti dal team, dipendenze risolte, stimato e abbastanza piccolo per uno sprint, acceptance criteria chiari e testabili, si sa come mostrarlo in review.", "Conviene avere pronti da 2 a 3 sprint di item (10-15 storie). È il «cancello» tra grooming e sprint planning, come la DoD è il cancello tra execution e increment."], who: ["po", "dev"], io: [] },
+  cap: { k: "Sprint planning", t: "Capacity e commitment", p: ["La capacity è il tempo che il team può davvero dedicare agli item: per ogni persona (giorni disponibili meno ferie, meno i giorni per le altre attività Scrum) × ore al giorno, più un margine. Nell'esempio del corso: da 140 a 197 ore.", "Si confronta con i task stimati (150 ore: realistico, ma vicino al minimo) e con la velocity. Il risultato si può vedere come forecast (la migliore stima) o come commitment (crea fiducia con il PO). Il PO non deve forzare l'impegno; lo ScrumMaster lo mette in discussione ma non lo decide."], who: ["dev", "sm", "po"], io: [["Regola", "Non iniziare ciò che non puoi finire"]] },
+  abterm: { k: "Sprint", t: "Abnormal termination", p: ["Durante lo sprint il goal non si cambia, si può solo chiarire. Se però il goal diventa del tutto inutile (per esempio cambia il mercato), il team avvisa e il product owner decide di terminare lo sprint in anticipo.", "È l'ultima risorsa: costa la pianificazione fatta e il lavoro iniziato. Dopo si fa un nuovo sprint planning, con una durata che riporti il team sulla cadenza originale."], who: ["po", "dev"], io: [] },
+  poker: { k: "Stima", t: "Planning poker", p: ["Tecnica di stima per consenso (Grenning, Cohn). Carte: 1, 2, 3, 5, 8, 13, 20, 40, 100, più 0 (già fatto), ? (non ho capito), ∞ (troppo grande), e la pausa caffè.", "Il PO legge l'item, il team fa domande, ognuno sceglie una carta in privato, si scoprono tutte insieme (nessuno si ancora agli altri). Se non coincidono spiegano chi ha dato il valore più alto e il più basso, poi si rigioca. Si cerca il consenso, mai un compromesso o una media."], who: ["dev", "po", "sm"], io: [["Quando", "Grooming e release planning"]] },
+  relcalc: { k: "Release planning", t: "Fixed date e fixed scope", p: ["Fixed date: si contano gli sprint fino alla data; la linea will-have è a (velocity lenta × numero di sprint) punti dalla cima del backlog, la might-have a (velocity veloce × sprint). Sopra la prima: arriva; tra le due: forse; sotto: no. Buona notizia se i must-have stanno sopra la will-have.", "Fixed scope: si sommano i punti degli item voluti; sprint minimi = totale / velocity veloce, massimi = totale / velocity lenta, arrotondando per eccesso. Esempio: 150 punti con velocity 18-22 → da 7 a 9 sprint."], who: ["po", "dev"], io: [] },
+  charts: { k: "Misure", t: "Grafici di release", p: ["Burndown di release (fixed scope): ogni sprint, il lavoro che resta; ogni sprint cala di una velocity.", "Burnup (fixed scope): il target è una linea orizzontale e il lavoro completato sale verso di essa; se lo scope cambia basta alzare la linea. Per le release fixed date si usa un burnup con le linee will-have, might-have e must-have."], who: ["po"], io: [["Si aggiornano", "A ogni sprint review"]] },
+  debt: { k: "Qualità", t: "Technical debt", p: ["Metafora di Ward Cunningham: consegnare codice non perfetto è come indebitarsi, va bene se si ripaga presto; ogni minuto passato su codice non proprio giusto sono gli interessi. Oggi indica anche design superato, difetti noti, test insufficienti, troppo testing manuale, integrazione e rilascio lenti.", "Tre tipi: naive (immaturità di persone o processo), unavoidable (il buon design emerge costruendo, componenti esterni che cambiano), strategic (scelta consapevole, per esempio arrivare sul mercato in tempo)."], who: ["dev", "po"], io: [["Nasce da", "DoD debole, pressione delle scadenze"]] },
+  dcons: { k: "Qualità", t: "Conseguenze e cause del debito", p: ["Conseguenze: punto di non ritorno imprevedibile (crescita non lineare), consegne più lente (meno velocity domani), molti difetti, costi in salita, prodotto che si atrofizza, meno prevedibilità, frustrazione e persone migliori che se ne vanno, clienti scontenti.", "Cause: pressione di una scadenza, voler accelerare la velocity, il mito che meno test renda più veloci. Il debito si accumula sul debito, fino alla bancarotta tecnica (riscrivere il prodotto)."], who: [], io: [] },
+  dman: { k: "Qualità", t: "Gestire il technical debt", p: ["Limitarne l'accumulo: buone pratiche tecniche (TDD, CI, test automatici, refactoring), una Definition of Done forte, capire l'economia del debito (nell'esempio del corso: 1,75M contro 1,4M + costi nascosti). Renderlo visibile: nel product backlog, nel sistema dei difetti o in un backlog dedicato.", "Ripagarlo: il debito happened-upon (trovato lavorando) si pulisce subito fino a una soglia, il resto diventa known; ogni sprint si sceglie del debito targeted. Boy scout rule (lascia il codice più pulito di come l'hai trovato), ripagare a rate, prima quello a interesse alto, insieme al lavoro di valore. Non tutto va ripagato (prototipi, prodotti a fine vita)."], who: ["dev", "po"], io: [] },
+  trunk: { k: "Laboratorio 1", t: "Trunk-based development", p: ["Con il continuous delivery i rami lunghi sono dannosi: più restano separati, più divergono e più conflitti creano (peggio con team grandi, commit frequenti, cambiamenti generati da LLM).", "Soluzione: commit direttamente sul trunk, oppure rami brevissimi con merge almeno una volta al giorno (scaled trunk-based). Per non rompere il trunk: branch protection (niente push diretti, serve una pull request), check (un workflow verde) e code review, disciplina."], who: ["dev"], io: [] },
+  git: { k: "Laboratorio 1", t: "Git e GitHub", p: ["Git registra un grafo di commit: ogni commit è un'istantanea immutabile con un genitore; un branch è un'etichetta su un commit; un merge è un commit con due genitori; un conflict nasce quando due cambiamenti toccano la stessa riga e va risolto a mano. Commit salva in locale, push pubblica sul server, pull porta i commit degli altri.", "Git non è GitHub: GitHub ospita i repository e aggiunge pull request, review, branch protection, issues e GitHub Actions. Flusso CI di Fowler: pull, modifica con test, pull di nuovo, build, push, la CI costruisce, finito solo quando è verde."], who: ["dev"], io: [] },
+  gha: { k: "Laboratorio 1", t: "GitHub Actions e Makefile", p: ["GitHub Actions esegue workflow (file YAML in .github/workflows) attivati da eventi: push, pull request, manuale, schedulato. Un workflow contiene job, eseguiti su runner (macchine virtuali, scelte con runs-on; ordine con needs); un job contiene step, comandi (run) o action (uses).", "Non programmare in YAML: il workflow dice quando, dove e con quali permessi; il Makefile dice cosa (make check, make build). Così lo stesso comando gira in locale, nei git hook e in qualsiasi CI, senza lock-in."], who: ["dev"], io: [] },
+  disc: { k: "Laboratorio 1", t: "Disciplina e git hooks", p: ["Sempre pull prima di committare e pushare; eseguire i test in locale; dare priorità al trunk verde (se lo rompi lo sistemi subito, se non puoi fai revert); incrementi piccoli; rami brevi; coordinarsi con il team.", "I git hook aiutano: pre-commit (per esempio make check), commit-msg, pre-push sul client; pre-receive sul server (non su GitHub). Si possono saltare con --no-verify: a decidere resta la pipeline."], who: ["dev"], io: [] },
+  flags: { k: "Laboratorio 1", t: "Feature flags e branch by abstraction", p: ["Come fare commit piccoli e sempre rilasciabili su funzionalità grandi. Feature flag: il codice nuovo convive con il vecchio e una condizione esterna sceglie quale eseguire (nel caso più semplice un if). Troppi flag sono debito tecnico: vanno tolti appena finita la funzionalità.", "Branch by abstraction: per sostituire un sottosistema si crea un'interfaccia che astrae il vecchio e il nuovo, si sviluppa il nuovo dietro l'interfaccia e si sostituisce quando è pronto."], who: ["dev"], io: [] },
+  scope: { k: "Laboratorio 2", t: "Piramide dei test", p: ["Per ambito: unit (una funzione o classe, veloci, sai dove è il guasto, tanti), integration (alcune parti insieme, con database o file, più lenti, meno), end-to-end (tutto il sistema, lenti, pochi).", "Gli unit test non dicono se i pezzi si incastrano, gli end-to-end non dicono quale pezzo è rotto: servono tutti, in proporzioni diverse. Lo stesso codice di test può essere unit, integration o end-to-end a seconda di cosa è in esecuzione."], who: ["dev"], io: [] },
+  box: { k: "Laboratorio 2", t: "Tipi di test e quadranti", p: ["Per conoscenza: black-box (solo ciò che il software promette) o white-box (scritti leggendo il codice). Per requisito: funzionali (fa ciò che dice la user story?) o non funzionali (performance, sicurezza). Manuali o automatici: controllato due volte a mano? va automatizzato.", "Agile testing quadrants: a sinistra i test che supportano il team mentre costruisce (unit, integration, acceptance delle storie); a destra quelli che criticano il prodotto (esplorativi, usabilità, performance, penetration, fuzzing, utenti reali e le demo della sprint review)."], who: ["dev", "po"], io: [] },
+  inpipe: { k: "Laboratorio 2", t: "Test nella pipeline", p: ["I test si distribuiscono lungo la pipeline: nel commit stage unit e integration, solo veloci (pochi minuti); nell'acceptance stage gli end-to-end sulla candidate release installata; poi altri gate (load test, test manuali); dopo il deploy lo smoke test (la home page si carica?).", "Più a destra: più pezzi in esecuzione, test più lenti, eseguiti meno spesso. Chi testa? Lo Scrum team, che è cross-functional: la qualità è responsabilità dei developers attraverso la Definition of Done."], who: ["dev"], io: [] },
+  tdd: { k: "Laboratorio 2", t: "Test-driven development", p: ["Due regole: scrivi codice nuovo solo se un test automatico è fallito, ed elimina le duplicazioni. Ne nasce il ciclo red (scrivi un test che fallisce), green (il minimo codice per farlo passare), refactor (migliora il codice con i test verdi).", "Il test è il primo cliente dell'API (se è scomodo da scrivere, l'API è scomoda da usare) e diventa documentazione vivente. Non è una religione né una bacchetta magica: gran parte dei benefici viene dall'avere test e dal pensare prima all'interfaccia."], who: ["dev"], io: [] },
+  good: { k: "Laboratorio 2", t: "Buoni test", p: ["Un test testa qualcosa se esiste un bug plausibile che lo fa fallire: vederlo fallire almeno una volta, usare input che distinguono giusto da sbagliato, test isolati e indipendenti dall'ordine. Struttura Arrange-Act-Assert (Given-When-Then); fixture per preparare e smontare l'ambiente (in pytest con @pytest.fixture).", "Da un bug: il test più piccolo che lo riproduce (rosso), la correzione (verde), e il test resta per sempre (regression test). Niente test, niente refactoring; una cosa alla volta. Il lab cita anche fuzzing, property-based e mutation testing, e il chaos engineering di Netflix."], who: ["dev"], io: [] },
+});
+D.splanlv = D.splan; D.dailylv = D.daily;
+D.est.p = ["Si stima come team (chi fa il lavoro), le stime non sono impegni, contano accuratezza e non precisione, e si usano dimensioni relative (è più facile dire quale bicchiere è più pieno che quanti ml contiene).", "Livelli: portfolio backlog in T-shirt size; product backlog in story points (circa il 70% delle organizzazioni) o ideal days; task dello sprint in ore ideali. Un ideal day è lavoro concentrato senza interruzioni, non un giorno di calendario."];
+D.burn = { k: "Misure", t: "Grafici di sprint", p: ["Sprint burndown: ogni giorno, le ore stimate che restano per i task dello sprint. Sotto la linea ideale si è in anticipo, sopra in ritardo; può risalire quando si scoprono nuovi task.", "Sprint burnup: i punti degli item completati giorno per giorno; se resta piatto per giorni ci sono troppi item in corso. La task board mostra i task in to do, in progress e done."], who: ["dev"], io: [["Si discute in", "Daily scrum"]] };
+
+const panel = document.getElementById("panel");
+function show(id) {
+  const d = D[id]; if (!d) return;
+  document.querySelectorAll(".hit").forEach(g => g.classList.toggle("sel", g.dataset.id === id));
+  const who = d.who.length ? d.who.map(w => `<span style="color:${P[w][1]}">${P[w][0]}</span>`).join("") : '<span style="color:var(--muted)">concetto generale</span>';
+  const io = (d.io || []).map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  panel.innerHTML = `<div><button class="close" id="closeP">Chiudi</button><div class="k">${d.k}</div><h2>${d.t}</h2>${d.p.map(x => `<p>${x}</p>`).join("")}</div>
+    <div><div class="k">Chi è coinvolto</div><div class="who" style="margin:6px 0 14px">${who}</div><dl>${io}</dl></div>`;
+  panel.hidden = false; panel.scrollTop = 0;
+  document.getElementById("closeP").addEventListener("click", () => { panel.hidden = true; document.querySelectorAll(".hit.sel").forEach(g => g.classList.remove("sel")); });
+}
+document.querySelectorAll(".hit").forEach(g => {
+  g.setAttribute("role", "button");
+  g.addEventListener("click", e => { e.stopPropagation(); show(g.dataset.id); });
+  g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(g.dataset.id); } });
+});
+addEventListener("keydown", e => { if (e.key === "Escape") panel.hidden = true; });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulatore ASD</title>
+<style>
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+img { max-width: 100%; }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: an exam-sheet single column (max 780px) with a sticky header for timer and progress; start, question and result screens swap in place. */
+:root {
+  --bg: #eef1f5; --paper: #ffffff; --ink: #17202b; --muted: #5d6877; --line: #d4dbe4; --soft: #f5f7fa;
+  --accent: #2f5bd3; --ok: #1d8a52; --ok-bg: #e5f5ec; --ko: #c43b3b; --ko-bg: #fbe9e9; --warn: #b26a00;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1318; --paper: #182029; --ink: #e7ebf1; --muted: #9ba6b5; --line: #334050; --soft: #1f2833;
+  --accent: #86a6ff; --ok: #4cc488; --ok-bg: #16332a; --ko: #f07a7a; --ko-bg: #3a1e22; --warn: #f0b04a; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #0f1318; --paper: #182029; --ink: #e7ebf1; --muted: #9ba6b5; --line: #334050; --soft: #1f2833;
+  --accent: #86a6ff; --ok: #4cc488; --ok-bg: #16332a; --ko: #f07a7a; --ko-bg: #3a1e22; --warn: #f0b04a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 18px 60px; }
+h1 { font-family: var(--font-display); font-size: clamp(1.7rem, 4vw, 2.3rem); margin: 0 0 4px; text-wrap: balance; }
+h2 { font-family: var(--font-display); font-size: 1.3rem; margin: 0 0 10px; }
+.muted { color: var(--muted); }
+a { color: var(--accent); }
+.links { margin: 6px 0 0; font-weight: 600; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+.stack { display: grid; gap: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button { font: inherit; font-weight: 600; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 10px 16px; cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select { font: inherit; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--soft); border-radius: 10px; padding: 10px 12px; }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.stat span { font-size: .85rem; color: var(--muted); }
+header.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--bg); padding-block: 8px; margin-bottom: 10px; }
+.bar .row { justify-content: space-between; }
+.timer { font-family: var(--font-mono); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.timer.low { color: var(--ko); }
+.prog { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+.prog i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+.score-live { font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tag { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.q { font-size: 1.15rem; font-weight: 600; margin: 6px 0 14px; }
+.opts { display: grid; gap: 8px; }
+.opt { text-align: left; font-weight: 400; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
+.opt .k { font-family: var(--font-mono); color: var(--muted); min-width: 1.2em; }
+.opt:disabled { opacity: 1; cursor: default; }
+.opt.ok { border-color: var(--ok); background: var(--ok-bg); }
+.opt.ko { border-color: var(--ko); background: var(--ko-bg); }
+.fb { margin-top: 12px; border-radius: 10px; padding: 12px 14px; }
+.fb.ok { background: var(--ok-bg); } .fb.ko { background: var(--ko-bg); }
+.fb strong { display: block; margin-bottom: 2px; }
+textarea { width: 100%; min-height: 160px; font: inherit; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--soft); color: var(--ink); resize: vertical; }
+.points { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; }
+.points label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.topics { display: grid; gap: 6px; }
+.trow { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: .92rem; }
+.tbar { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.tbar i { display: block; height: 100%; }
+.trow b { font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
+details.wrong { border-top: 1px solid var(--line); padding: 8px 0; }
+details.wrong summary { cursor: pointer; }
+.big { font-family: var(--font-display); font-size: 3rem; line-height: 1; font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .trow { grid-template-columns: minmax(0, 1fr) 54px; } .trow .tbar { grid-column: 1 / -1; grid-row: 2; } }
+@media (prefers-reduced-motion: reduce) { .prog i { transition: none; } }
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script src="questions.js"></script>
+<script>
+const TOPICS = {
+  intro: "Introduzione a Scrum", princ: "Principi agili", framework: "Framework e ruoli", sprints: "Sprint e DoD",
+  req: "Requisiti e user story", backlog: "Product backlog", est: "Stima e velocity", debt: "Technical debt",
+  plan: "Livelli di pianificazione", splan: "Sprint planning", sexec: "Sprint execution", review: "Sprint review",
+  retro: "Retrospective", cicd: "Lab 1: CI/CD", test: "Lab 2: Testing",
+};
+const hash = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+const mcBank = MC.map(([t, q, o, e]) => ({ id: "m" + hash(q), t, q, o, e }));
+const openBank = OPEN.map(([t, q, p]) => ({ id: "o" + hash(q), t, q, p }));
+const byId = Object.fromEntries([...mcBank, ...openBank].map(x => [x.id, x]));
+
+// per-viewer memory: how many times each question was shown, and the last wrong answers
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+let seen = store.get("asdq-seen", {});
+let wrongIds = store.get("asdq-wrong", []);
+let history = store.get("asdq-history", []);
+
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+// pick n questions: proportional to topic size, least-seen first, random among equals
+function pick(bank, n) {
+  n = Math.min(n, bank.length);
+  const groups = {};
+  for (const q of bank) (groups[q.t] ||= []).push(q);
+  const order = q => (seen[q.id] || 0) + Math.random() * 0.5;
+  for (const t in groups) groups[t].sort((a, b) => order(a) - order(b));
+  const quota = {}; let given = 0;
+  for (const t in groups) { quota[t] = Math.floor(n * groups[t].length / bank.length); given += quota[t]; }
+  const rest = Object.keys(groups).sort((a, b) => (n * groups[b].length / bank.length % 1) - (n * groups[a].length / bank.length % 1));
+  for (let i = 0; given < n; i = (i + 1) % rest.length) { if (quota[rest[i]] < groups[rest[i]].length) { quota[rest[i]]++; given++; } }
+  let out = [];
+  for (const t in groups) out = out.concat(groups[t].slice(0, quota[t]));
+  return shuffle(out);
+}
+
+const app = document.getElementById("app");
+let S = null; // session
+let tick = null;
+
+function startScreen() {
+  clearInterval(tick);
+  const unseenMc = mcBank.filter(q => !seen[q.id]).length;
+  const unseenOpen = openBank.filter(q => !seen[q.id]).length;
+  const last = history.slice(-3).reverse();
+  app.innerHTML = `
+  <div class="stack">
+    <div>
+      <div class="tag">Agile Software Development · test intermedio</div>
+      <h1>Simulatore d'esame</h1>
+      <p class="muted">Domande sulle slide di Scrum (Rubin) e sui laboratori CI/CD e testing, con le risposte del corso. A ogni avvio vengono scelte prima le domande che non hai ancora visto, distribuite su tutti gli argomenti. Le domande sono in inglese come le slide, le spiegazioni in italiano.</p>
+      <p class="links"><a href="map.html">Mappa di Scrum</a> · <a href="https://github.com/salvo27/artificial-intelligence-and-computer-science/blob/main/courses/research-and-development-methodologies/agile-software-development/summary.md">Riassunto del corso</a> · <a href="https://github.com/salvo27/artificial-intelligence-and-computer-science">Repository</a></p>
+    </div>
+    <div class="card stack">
+      <div class="stats">
+        <div class="stat"><b>${mcBank.length}</b><span>domande a risposta multipla</span></div>
+        <div class="stat"><b>${openBank.length}</b><span>domande aperte</span></div>
+        <div class="stat"><b>${unseenMc} + ${unseenOpen}</b><span>ancora mai viste</span></div>
+        <div class="stat"><b>${wrongIds.length}</b><span>errori da ripassare</span></div>
+      </div>
+      <div class="row">
+        <label for="mode">Formato</label>
+        <select id="mode">
+          <option value="exam">Esame completo: 100 multiple + 20 aperte, 2 ore</option>
+          <option value="half">Metà esame: 50 multiple + 10 aperte, 1 ora</option>
+          <option value="quick">Allenamento veloce: 20 multiple + 3 aperte, senza timer</option>
+          <option value="mconly">Solo multiple: 100 domande, 1 ora e 30</option>
+          <option value="topic">Un solo argomento, senza timer</option>
+        </select>
+        <select id="topic" hidden>${Object.entries(TOPICS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
+      </div>
+      <div class="row">
+        <button class="primary" id="go">Inizia</button>
+        <button id="redo" ${wrongIds.length ? "" : "disabled"}>${wrongIds.length ? `Ripassa i ${wrongIds.length} errori` : "Nessun errore da ripassare"}</button>
+        <button id="reset">Azzera lo storico</button>
+      </div>
+      <p class="muted" style="margin:0;font-size:.9rem">Le risposte multiple sono corrette subito. Per le aperte scrivi la risposta, poi confrontala con i punti chiave e spunta quelli che hai toccato. Tasti 1-4 per rispondere, Invio per andare avanti.</p>
+    </div>
+    ${last.length ? `<div class="card"><h2>Ultime simulazioni</h2>${last.map(h => `<div class="row" style="justify-content:space-between"><span>${h.date} · ${h.label}</span><b>${h.mc}${h.open != null ? ` · aperte ${h.open}` : ""}</b></div>`).join("")}</div>` : ""}
+  </div>`;
+  const mode = document.getElementById("mode"), topic = document.getElementById("topic");
+  mode.addEventListener("change", () => { topic.hidden = mode.value !== "topic"; });
+  document.getElementById("go").addEventListener("click", () => begin(mode.value, topic.value));
+  document.getElementById("redo").addEventListener("click", () => begin("wrong"));
+  document.getElementById("reset").addEventListener("click", e => {
+    if (e.target.dataset.sure) { seen = {}; wrongIds = []; history = []; store.set("asdq-seen", seen); store.set("asdq-wrong", wrongIds); store.set("asdq-history", history); startScreen(); }
+    else { e.target.dataset.sure = "1"; e.target.textContent = "Clicca di nuovo per confermare"; }
+  });
+}
+
+function begin(mode, topic) {
+  let mc = [], op = [], minutes = 0, label = "";
+  if (mode === "exam") { mc = pick(mcBank, 100); op = pick(openBank, 20); minutes = 120; label = "Esame completo"; }
+  if (mode === "half") { mc = pick(mcBank, 50); op = pick(openBank, 10); minutes = 60; label = "Metà esame"; }
+  if (mode === "quick") { mc = pick(mcBank, 20); op = pick(openBank, 3); label = "Allenamento veloce"; }
+  if (mode === "mconly") { mc = pick(mcBank, 100); minutes = 90; label = "Solo multiple"; }
+  if (mode === "topic") { mc = pick(mcBank.filter(q => q.t === topic), 999); op = pick(openBank.filter(q => q.t === topic), 999); label = TOPICS[topic]; }
+  if (mode === "wrong") { mc = shuffle(wrongIds.map(id => byId[id]).filter(Boolean)); label = "Ripasso errori"; }
+  if (!mc.length && !op.length) { startScreen(); return; }
+  const items = [...mc.map(q => ({ kind: "mc", q, opts: shuffle(q.o.map((text, i) => ({ text, ok: i === 0 }))) })), ...op.map(q => ({ kind: "open", q, text: "", checks: [], revealed: false }))];
+  for (const it of items) seen[it.q.id] = (seen[it.q.id] || 0) + 1;
+  store.set("asdq-seen", seen);
+  S = { items, i: 0, label, mode, end: minutes ? Date.now() + minutes * 60000 : null };
+  if (S.end) { tick = setInterval(updateTimer, 1000); }
+  render();
+}
+
+function fmt(ms) { const s = Math.max(0, Math.round(ms / 1000)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return `${h}:${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}`; }
+function updateTimer() {
+  const el = document.getElementById("timer"); if (!el || !S) return;
+  const left = S.end - Date.now();
+  el.textContent = "⏱ " + fmt(left);
+  el.classList.toggle("low", left < 10 * 60000);
+  if (left <= 0) { clearInterval(tick); finish(true); }
+}
+function liveScore() {
+  const done = S.items.filter(x => x.kind === "mc" && x.answer != null);
+  const ok = done.filter(x => x.opts[x.answer].ok).length;
+  return `${ok} giuste su ${done.length} risposte`;
+}
+
+function render() {
+  const it = S.items[S.i], n = S.items.length;
+  const head = `<header class="bar"><div class="row"><span><b>${S.i + 1}</b> / ${n} · ${S.label}</span>
+    <span class="score-live">${liveScore()}</span>
+    ${S.end ? `<span class="timer" id="timer">⏱ ${fmt(S.end - Date.now())}</span>` : ""}
+    <button id="stop">Termina</button></div><div class="prog"><i style="width:${(S.i) / n * 100}%"></i></div></header>`;
+  let body = "";
+  if (it.kind === "mc") {
+    const answered = it.answer != null;
+    body = `<div class="card"><div class="tag">${TOPICS[it.q.t]} · risposta multipla</div><div class="q">${esc(it.q.q)}</div>
+      <div class="opts">${it.opts.map((o, k) => {
+        let cls = "";
+        if (answered && o.ok) cls = "ok"; else if (answered && k === it.answer) cls = "ko";
+        return `<button class="opt ${cls}" data-k="${k}" ${answered ? "disabled" : ""}><span class="k">${k + 1}</span><span>${esc(o.text)}</span></button>`;
+      }).join("")}</div>
+      ${answered ? (it.opts[it.answer].ok
+        ? `<div class="fb ok"><strong>Giusto.</strong>${esc(it.q.e)}</div>`
+        : `<div class="fb ko"><strong>Sbagliato. La risposta giusta è: ${esc(it.opts.find(o => o.ok).text)}</strong>${esc(it.q.e)}</div>`) : ""}
+      </div>`;
+  } else {
+    body = `<div class="card stack"><div><div class="tag">${TOPICS[it.q.t]} · domanda aperta</div><div class="q">${esc(it.q.q)}</div></div>
+      <textarea id="ans" placeholder="Scrivi la tua risposta come all'esame…">${esc(it.text)}</textarea>
+      ${it.revealed ? `<div><b>Punti chiave di una risposta completa.</b> <span class="muted">Spunta quelli che hai toccato.</span>
+        <ul class="points">${it.q.p.map((p, k) => `<li><label><input type="checkbox" data-c="${k}" ${it.checks[k] ? "checked" : ""}> <span>${esc(p)}</span></label></li>`).join("")}</ul></div>`
+        : `<div><button id="reveal">Mostra la soluzione</button></div>`}
+    </div>`;
+  }
+  const canNext = it.kind === "open" || it.answer != null;
+  app.innerHTML = head + body + `<div class="row" style="margin-top:14px;justify-content:space-between">
+    <button id="prev" ${S.i ? "" : "disabled"}>Indietro</button>
+    <button class="primary" id="next" ${canNext ? "" : "disabled"}>${S.i === n - 1 ? "Vedi il risultato" : "Avanti"}</button></div>`;
+  app.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => answer(+b.dataset.k)));
+  const ta = document.getElementById("ans"); if (ta) ta.addEventListener("input", () => { it.text = ta.value; });
+  const rv = document.getElementById("reveal"); if (rv) rv.addEventListener("click", () => { it.revealed = true; render(); });
+  app.querySelectorAll("[data-c]").forEach(c => c.addEventListener("change", () => { it.checks[+c.dataset.c] = c.checked; }));
+  document.getElementById("prev").addEventListener("click", () => { S.i--; render(); });
+  document.getElementById("next").addEventListener("click", next);
+  document.getElementById("stop").addEventListener("click", e => {
+    if (e.target.dataset.sure) finish(false); else { e.target.dataset.sure = "1"; e.target.textContent = "Conferma"; }
+  });
+  window.scrollTo(0, 0);
+}
+function answer(k) {
+  const it = S.items[S.i]; if (it.answer != null) return;
+  it.answer = k;
+  const ok = it.opts[k].ok;
+  const set = new Set(wrongIds);
+  if (ok) set.delete(it.q.id); else set.add(it.q.id);
+  wrongIds = [...set]; store.set("asdq-wrong", wrongIds);
+  render();
+}
+function next() { if (S.i < S.items.length - 1) { S.i++; render(); } else finish(false); }
+
+function finish(timeout) {
+  clearInterval(tick);
+  const mcs = S.items.filter(x => x.kind === "mc"), ops = S.items.filter(x => x.kind === "open");
+  const ok = mcs.filter(x => x.answer != null && x.opts[x.answer].ok).length;
+  const openScore = ops.reduce((s, x) => s + (x.revealed ? x.checks.filter(Boolean).length / x.q.p.length : 0), 0);
+  const openDone = ops.filter(x => x.revealed).length;
+  const per = {};
+  for (const x of mcs) { const p = (per[x.q.t] ||= { ok: 0, tot: 0 }); p.tot++; if (x.answer != null && x.opts[x.answer].ok) p.ok++; }
+  const wrong = mcs.filter(x => x.answer == null || !x.opts[x.answer].ok);
+  const pct = mcs.length ? Math.round(ok / mcs.length * 100) : 0;
+  history.push({ date: new Date().toLocaleDateString("it-IT"), label: S.label, mc: mcs.length ? `${ok}/${mcs.length}` : "-", open: ops.length ? `${openScore.toFixed(1)}/${ops.length}` : null });
+  store.set("asdq-history", history.slice(-30));
+  const col = v => v >= .8 ? "var(--ok)" : v >= .6 ? "var(--warn)" : "var(--ko)";
+  app.innerHTML = `<div class="stack">
+    <div><div class="tag">${S.label}${timeout ? " · tempo scaduto" : ""}</div><h1>Risultato</h1></div>
+    <div class="card stats">
+      ${mcs.length ? `<div class="stat"><b class="big" style="color:${col(ok / mcs.length)}">${pct}%</b><span>${ok} giuste su ${mcs.length} a risposta multipla</span></div>` : ""}
+      ${ops.length ? `<div class="stat"><b class="big">${openScore.toFixed(1)}</b><span>punti su ${ops.length} nelle aperte (autovalutazione, ${openDone} corrette)</span></div>` : ""}
+      <div class="stat"><b class="big">${wrong.length}</b><span>errori o non risposte, salvati per il ripasso</span></div>
+    </div>
+    ${mcs.length ? `<div class="card"><h2>Per argomento</h2><div class="topics">${Object.entries(per).sort((a, b) => a[1].ok / a[1].tot - b[1].ok / b[1].tot).map(([t, p]) =>
+      `<div class="trow"><span>${TOPICS[t]}</span><div class="tbar"><i style="width:${p.ok / p.tot * 100}%;background:${col(p.ok / p.tot)}"></i></div><b>${p.ok}/${p.tot}</b></div>`).join("")}</div>
+      <p class="muted" style="margin-bottom:0">In alto gli argomenti più deboli: ripassali sul riassunto o con la modalità «un solo argomento».</p></div>` : ""}
+    ${wrong.length ? `<div class="card"><h2>Le domande sbagliate</h2>${wrong.map(x => `<details class="wrong"><summary>${esc(x.q.q)}</summary>
+      <p><b>Giusta:</b> ${esc(x.q.o[0])}${x.answer != null ? `<br><span class="muted">Hai risposto: ${esc(x.opts[x.answer].text)}</span>` : "<br><span class='muted'>Non risposta</span>"}</p><p>${esc(x.q.e)}</p></details>`).join("")}</div>` : ""}
+    <div class="row"><button class="primary" id="again">Nuova simulazione</button><button id="home">Torna all'inizio</button></div>
+  </div>`;
+  document.getElementById("again").addEventListener("click", () => begin(S.mode === "wrong" ? "wrong" : S.mode, S.items[0] && S.items[0].q.t));
+  document.getElementById("home").addEventListener("click", startScreen);
+  window.scrollTo(0, 0);
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+addEventListener("keydown", e => {
+  if (!S || !document.getElementById("next")) return;
+  if (e.target.tagName === "TEXTAREA") return;
+  const it = S.items[S.i];
+  if (it.kind === "mc" && it.answer == null && /^[1-4]$/.test(e.key)) answer(+e.key - 1);
+  else if (e.key === "Enter") { const b = document.getElementById("next"); if (!b.disabled) next(); }
+});
+startScreen();
+</script>
+</body>
+</html>

@@ -55,6 +55,23 @@ A course is **done** when:
 
 "Done" is not final: if the syllabus changes or someone finds mistakes, the course goes back to draft until it is fixed.
 
+## Quizzes
+
+Some courses have an interactive quiz (exam simulator) in a `quiz/` folder next to their summary, for example
+[`agile-software-development/quiz/`](courses/research-and-development-methodologies/agile-software-development/quiz/).
+It is published on GitHub Pages and linked in the index under the PDF.
+
+**To add questions**, edit only `questions.js` in that folder, following the format described at its top:
+
+- multiple choice: `[topic, question, [correct, wrong, wrong, wrong], explanation]`; the correct answer is **always the first**,
+  the page shuffles the options;
+- open questions: `[topic, question, [key points of a complete answer]]`;
+- answers must follow **the course** (the lecturer's slides), and the explanation should say why the answer is right.
+
+To try it locally, open `quiz/index.html` in the browser. To add a quiz to another course, copy the `quiz/` folder,
+replace `questions.js` and the topic names at the top of the script in `index.html`, set `quiz: true` on the course
+(or module) in `study-plan.yaml`, and run `python3 scripts/build_index.py`.
+
 ## What not to upload
 
 - Lecturers' slides, handouts or PDFs, and scans of textbooks. Link to the official page instead.
@@ -71,6 +88,10 @@ After merging a PR:
    and update `status` (`todo`, `draft` or `done`) following the [course status](#course-status) rules.
 2. Run `python3 scripts/build_index.py` (needs `pip install -r scripts/requirements.txt`).
 3. Commit the updated `study-plan.yaml`, `README.md` and `curricula/`.
+
+The quizzes don't need any action either: on every push to `main` that changes a `quiz/` folder, the **Pages** workflow
+publishes them (one-time setup: *Settings › Pages › Source: GitHub Actions*). To preview the site: `python3 scripts/build_site.py`,
+then open `build/site/index.html`.
 
 The PDFs don't need any action: on every push to `main`, the **PDF** workflow rebuilds the PDF of every course
 whose status is not `todo` and publishes it in the [`pdf` release](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/tag/pdf).

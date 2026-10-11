@@ -82,6 +82,29 @@ def pdf_link(c, plan):
     return "[PDF](https://github.com/{}/releases/download/pdf/{}.pdf)".format(plan["repository"], c["slug"])
 
 
+def pages_url(plan):
+    owner, repo = plan["repository"].split("/")
+    return "https://{}.github.io/{}/".format(owner, repo)
+
+
+def quizzes(c):
+    """(label, path) of every quiz of the course: the course itself or its modules can have one."""
+    out = []
+    if c.get("quiz"):
+        out.append(("Quiz", "courses/{}/quiz/".format(c["slug"])))
+    for m in c["modules"]:
+        if m.get("quiz"):
+            label = "Quiz" if len(c["modules"]) == 1 else "Quiz ({})".format(m["name"])
+            out.append((label, "courses/{}/{}/quiz/".format(c["slug"], m["slug"])))
+    return out
+
+
+def downloads(c, plan):
+    """PDF link, with the quiz links below it."""
+    links = [pdf_link(c, plan)] + ["[{}]({}{})".format(label, pages_url(plan), path) for label, path in quizzes(c)]
+    return "<br>".join(x for x in links if x)
+
+
 def curriculum_badge(c, plan):
     keys = c["curricula"]
     if not keys:
@@ -108,7 +131,7 @@ def main_index(plan):
     core = [c for c in courses if c["curricula"]]
     electives = [c for c in courses if not c["curricula"]]
     links = " · ".join("[{}](curricula/{}.md)".format(v["name"], v["slug"]) for v in plan["curricula"].values())
-    header = ("Course", "ECTS", "Curriculum", "Status", "PDF", "Contributors")
+    header = ("Course", "ECTS", "Curriculum", "Status", "PDF / Quiz", "Contributors")
 
     out = [progress(courses), "", "**Curricula:** " + links, ""]
     for year in sorted({c["year"] for c in core}):
@@ -118,13 +141,13 @@ def main_index(plan):
             group = [c for c in in_year if c["semester"] == sem]
             if not group:
                 continue
-            rows = [(course_link(c, ""), c["ects"], curriculum_badge(c, plan), status(c), pdf_link(c, plan),
+            rows = [(course_link(c, ""), c["ects"], curriculum_badge(c, plan), status(c), downloads(c, plan),
                      contributors(c)) for c in group]
             out += ["#### Semester {}".format(sem), "", table(header, rows), ""]
 
     out += ["### Free-choice courses", ""]
     if electives:
-        rows = [(course_link(c, ""), c["ects"], ELECTIVE, status(c), pdf_link(c, plan), contributors(c))
+        rows = [(course_link(c, ""), c["ects"], ELECTIVE, status(c), downloads(c, plan), contributors(c))
                 for c in electives]
         out += [table(header, rows), ""]
     else:
@@ -136,7 +159,7 @@ def curriculum_page(key, plan):
     cur = plan["curricula"][key]
     courses = sorted((c for c in plan["courses"] if key in c["curricula"]),
                      key=lambda c: (c["year"], c["semester"] or 0))
-    rows = [(c["year"], c["semester"] or "", course_link(c, "../"), c["ects"], status(c), pdf_link(c, plan),
+    rows = [(c["year"], c["semester"] or "", course_link(c, "../"), c["ects"], status(c), downloads(c, plan),
              contributors(c)) for c in courses]
     return "\n".join([
         GENERATED,
@@ -149,7 +172,7 @@ def curriculum_page(key, plan):
         "",
         progress(courses),
         "",
-        table(("Year", "Sem.", "Course", "ECTS", "Status", "PDF", "Contributors"), rows),
+        table(("Year", "Sem.", "Course", "ECTS", "Status", "PDF / Quiz", "Contributors"), rows),
         "",
     ])
 

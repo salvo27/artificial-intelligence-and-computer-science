@@ -14,7 +14,9 @@ Courses shared by both curricula appear only once.
 ## Course index
 
 Every course with some material has a **PDF** (summary and exercises) you can download from the index.
-The PDFs are regenerated automatically on every change.
+The PDFs are regenerated automatically on every change. Some courses also have an interactive **quiz**
+(an exam simulator), published on [GitHub Pages](https://salvo27.github.io/artificial-intelligence-and-computer-science/)
+and linked under the PDF.
 
 Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Data Science only. See what each [status](CONTRIBUTING.md#course-status) means.
 
@@ -27,10 +29,10 @@ Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Dat
 
 #### Semester 1
 
-| Course | ECTS | Curriculum | Status | PDF | Contributors |
+| Course | ECTS | Curriculum | Status | PDF / Quiz | Contributors |
 |---|---|---|---|---|---|
 | **[Deep Learning](courses/deep-learning/)** | 9 | 🟢 Common | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning.pdf) |  |
-| **[Research and Development Methodologies](courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | 🟢 Common | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/research-and-development-methodologies.pdf) |  |
+| **[Research and Development Methodologies](courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | 🟢 Common | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/research-and-development-methodologies.pdf)<br>[Quiz (Agile Software Development)](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/) |  |
 | **[Cryptography](courses/cryptography/)** | 6 | 🔒 COS | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/cryptography.pdf) |  |
 | **[Secure Software Design](courses/secure-software-design/)** | 6 | 🔒 COS | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/secure-software-design.pdf) |  |
 | **[Massively Parallel Programming on GPUs](courses/massively-parallel-programming-on-gpus/)** | 6 | 📊 DAS | ⬜ To do |  |  |
@@ -38,7 +40,7 @@ Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Dat
 
 #### Semester 2
 
-| Course | ECTS | Curriculum | Status | PDF | Contributors |
+| Course | ECTS | Curriculum | Status | PDF / Quiz | Contributors |
 |---|---|---|---|---|---|
 | **[Intelligent Systems](courses/intelligent-systems/)**<br><sub>Automated Planning · Intelligent Agents</sub> | 12 | 🟢 Common | ⬜ To do |  |  |
 | **[Theoretical Computer Science](courses/theoretical-computer-science/)**<br><sub>Decidability and Logics · Computational Complexity</sub> | 12 | 🟢 Common | ⬜ To do |  |  |
@@ -49,7 +51,7 @@ Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Dat
 
 #### Semester 1
 
-| Course | ECTS | Curriculum | Status | PDF | Contributors |
+| Course | ECTS | Curriculum | Status | PDF / Quiz | Contributors |
 |---|---|---|---|---|---|
 | **[Algorithmic Game Theory](courses/algorithmic-game-theory/)** | 6 | 🟢 Common | ⬜ To do |  |  |
 | **[Neurosymbolic AI](courses/neurosymbolic-ai/)**<br><sub>Foundations of Neurosymbolic AI · LLM Lab</sub> | 6 | 🟢 Common | ⬜ To do |  |  |
@@ -59,7 +61,7 @@ Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Dat
 
 #### Semester 2
 
-| Course | ECTS | Curriculum | Status | PDF | Contributors |
+| Course | ECTS | Curriculum | Status | PDF / Quiz | Contributors |
 |---|---|---|---|---|---|
 | **[Business Game](courses/business-game/)** | 6 | 🔒 COS | ⬜ To do |  |  |
 
