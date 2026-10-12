@@ -22,11 +22,15 @@ img { max-width: 100%; }
   --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]):not([data-skin]) {
   --bg: #0f1318; --paper: #182029; --ink: #e7ebf1; --muted: #9ba6b5; --line: #334050; --soft: #1f2833;
   --accent: #86a6ff; --ok: #4cc488; --ok-bg: #16332a; --ko: #f07a7a; --ko-bg: #3a1e22; --warn: #f0b04a; color-scheme: dark; } }
-:root[data-theme="dark"] { --bg: #0f1318; --paper: #182029; --ink: #e7ebf1; --muted: #9ba6b5; --line: #334050; --soft: #1f2833;
+:root[data-theme="dark"]:not([data-skin]), :root[data-skin="dark"] { --bg: #0f1318; --paper: #182029; --ink: #e7ebf1; --muted: #9ba6b5; --line: #334050; --soft: #1f2833;
   --accent: #86a6ff; --ok: #4cc488; --ok-bg: #16332a; --ko: #f07a7a; --ko-bg: #3a1e22; --warn: #f0b04a; color-scheme: dark; }
+/* theme chosen on the page (Auto follows the system): light, sepia (paper-like, softer for long sessions), dark */
+:root[data-skin="light"] { color-scheme: light; }
+:root[data-skin="sepia"] { --bg: #efe6d2; --paper: #faf4e6; --ink: #3a2e22; --muted: #6d5e4a; --line: #ddcfb4; --soft: #f4ebd8;
+  --accent: #2f55b8; --ok: #2f7a3e; --ok-bg: #e2ecd3; --ko: #b23a2e; --ko-bg: #f5ddd3; --warn: #9a5c00; color-scheme: light; }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
 .wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 18px 60px; }
@@ -96,8 +100,12 @@ details.wrong summary { cursor: pointer; }
 .cbar i { display: block; height: 100%; }
 /* the book tab uses its own accent, so it is clear which section you are in */
 .wrap[data-tab="book"] { --accent: #b4532a; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .wrap[data-tab="book"] { --accent: #f0a274; } }
-:root[data-theme="dark"] .wrap[data-tab="book"] { --accent: #f0a274; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]):not([data-skin]) .wrap[data-tab="book"] { --accent: #f0a274; } }
+:root[data-theme="dark"]:not([data-skin]) .wrap[data-tab="book"], :root[data-skin="dark"] .wrap[data-tab="book"] { --accent: #f0a274; }
+:root[data-skin="sepia"] .wrap[data-tab="book"] { --accent: #9b4a1f; }
+.skin { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); }
+.skin button, button.skin-cycle { padding: 4px 10px; font-size: .85rem; border-radius: 99px; }
+.skin button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 @media (max-width: 520px) { .trow { grid-template-columns: minmax(0, 1fr) 54px; } .trow .tbar { grid-column: 1 / -1; grid-row: 2; } }
 @media (prefers-reduced-motion: reduce) { .prog i { transition: none; } }
 </style>
@@ -137,6 +145,15 @@ const store = {
 let seen = store.get("asdq-seen", {});
 let wrongIds = store.get("asdq-wrong", []);
 let history = store.get("asdq-history", []);
+
+// reading theme chosen by the viewer: auto (follow the system), light, sepia, dark
+const SKINS = [["auto", "Auto"], ["light", "Chiaro"], ["sepia", "Seppia"], ["dark", "Scuro"]];
+let skin = store.get("asdq-skin", "auto");
+if (!SKINS.some(([k]) => k === skin)) skin = "auto";
+function applySkin() { if (skin === "auto") delete document.documentElement.dataset.skin; else document.documentElement.dataset.skin = skin; store.set("asdq-skin", skin); }
+applySkin();
+const skinName = () => SKINS.find(([k]) => k === skin)[1];
+function skinHtml() { return `<div class="skin" role="group" aria-label="Tema"><span>Tema</span>${SKINS.map(([k, v]) => `<button data-skin="${k}" aria-pressed="${skin === k}">${v}</button>`).join("")}</div>`; }
 
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
@@ -196,6 +213,7 @@ function resetButton(label) {
   return `<button id="reset">${label}</button>`;
 }
 function bindCommon() {
+  app.querySelectorAll("button[data-skin]").forEach(b => b.addEventListener("click", () => { skin = b.dataset.skin; applySkin(); startScreen(); }));
   app.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => { if (b.dataset.tab !== tab) setTab(b.dataset.tab); }));
   document.getElementById("reset").addEventListener("click", e => {
     if (!e.target.dataset.sure) { e.target.dataset.sure = "1"; e.target.textContent = "Clicca di nuovo per confermare"; return; }
@@ -223,6 +241,7 @@ function examScreen() {
   app.innerHTML = `
   <div class="stack">
     ${tabsHtml()}
+    ${skinHtml()}
     <div>
       <div class="tag">Agile Software Development · test intermedio</div>
       <h1>Simulatore d'esame</h1>
@@ -242,6 +261,7 @@ function examScreen() {
           <option value="exam">Esame completo: 100 multiple + 20 aperte, 2 ore</option>
           <option value="half">Metà esame: 50 multiple + 10 aperte, 1 ora</option>
           <option value="quick">Allenamento veloce: 20 multiple + 3 aperte, senza timer</option>
+          <option value="quickmc">Solo chiuse veloce: 20 domande, senza timer</option>
           <option value="mconly">Solo chiuse: 100 domande, 1 ora e 30</option>
           <option value="openonly">Solo aperte: 20 domande, senza timer</option>
           <option value="openall">Solo aperte: tutte le ${openBank.length}, senza timer</option>
@@ -278,6 +298,7 @@ function bookScreen() {
   app.innerHTML = `
   <div class="stack">
     ${tabsHtml()}
+    ${skinHtml()}
     <div>
       <div class="tag">Kenneth S. Rubin · Essential Scrum (Addison-Wesley, 2012)</div>
       <h1>Domande sul libro</h1>
@@ -292,6 +313,7 @@ function bookScreen() {
       </div>
       <div class="row">
         <button class="primary" data-go="bookquiz">Mix di tutti i capitoli: 30 chiuse + 5 aperte</button>
+        <button data-go="bookquick">20 chiuse veloci</button>
         <button data-go="bookall">Tutte le ${bookMc.length} chiuse</button>
         <button data-go="bookopen">Tutte le ${bookOpen.length} aperte</button>
         <button data-go="wrong" ${nWrong ? "" : "disabled"}>Ripassa i ${nWrong} errori</button>
@@ -310,11 +332,13 @@ function begin(mode, topic) {
   if (mode === "exam") { mc = pick(mcBank, 100); op = pick(openBank, 20); minutes = 120; label = "Esame completo"; }
   if (mode === "half") { mc = pick(mcBank, 50); op = pick(openBank, 10); minutes = 60; label = "Metà esame"; }
   if (mode === "quick") { mc = pick(mcBank, 20); op = pick(openBank, 3); label = "Allenamento veloce"; }
+  if (mode === "quickmc") { mc = pick(mcBank, 20); label = "20 chiuse"; }
   if (mode === "mconly") { mc = pick(mcBank, 100); minutes = 90; label = "Solo chiuse"; }
   if (mode === "openonly") { op = pick(openBank, 20); label = "Solo domande aperte"; }
   if (mode === "openall") { op = pick(openBank, openBank.length); label = "Tutte le domande aperte"; }
   if (mode === "topic") { mc = pick(mcBank.filter(q => q.t === topic), 999); op = pick(openBank.filter(q => q.t === topic), 999); label = TOPICS[topic]; }
   if (mode === "bookquiz") { mc = pick(bookMc, 30); op = pick(bookOpen, 5); label = "Libro: mix di tutti i capitoli"; }
+  if (mode === "bookquick") { mc = pick(bookMc, 20); label = "Libro: 20 chiuse"; }
   if (mode === "bookall") { mc = pick(bookMc, bookMc.length); label = "Libro: tutte le chiuse"; }
   if (mode === "bookopen") { op = pick(bookOpen, bookOpen.length); label = "Libro: tutte le aperte"; }
   if (mode === "bookch") { mc = pick(bookMc.filter(q => q.t === topic), 999); op = pick(bookOpen.filter(q => q.t === topic), 999); label = LABELS[topic]; }
@@ -354,6 +378,7 @@ function render() {
   const head = `<header class="bar"><div class="row"><span><b>${S.i + 1}</b> / ${n} · ${S.label}</span>
     <span class="score-live">${liveScore()}</span>
     ${S.end ? `<span class="timer" id="timer">⏱ ${fmt(S.end - Date.now())}</span>` : ""}
+    <button class="skin-cycle" id="skin-cycle" title="Cambia tema: Auto, Chiaro, Seppia, Scuro">Tema: ${skinName()}</button>
     <button id="stop">Termina</button></div><div class="prog"><i style="width:${(S.i) / n * 100}%"></i></div></header>`;
   let body = "";
   if (it.kind === "mc") {
@@ -396,6 +421,9 @@ function render() {
   app.querySelectorAll("[data-c]").forEach(c => c.addEventListener("change", () => { it.checks[+c.dataset.c] = c.checked; }));
   document.getElementById("prev").addEventListener("click", () => { S.i--; render(); });
   document.getElementById("next").addEventListener("click", next);
+  document.getElementById("skin-cycle").addEventListener("click", e => {
+    skin = SKINS[(SKINS.findIndex(([k]) => k === skin) + 1) % SKINS.length][0]; applySkin(); e.target.textContent = "Tema: " + skinName();
+  });
   document.getElementById("stop").addEventListener("click", e => {
     if (e.target.dataset.sure) finish(false); else { e.target.dataset.sure = "1"; e.target.textContent = "Conferma"; }
   });
