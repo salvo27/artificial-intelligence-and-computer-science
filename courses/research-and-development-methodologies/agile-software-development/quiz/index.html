@@ -37,13 +37,14 @@ a { color: var(--accent); }
 .links { margin: 6px 0 0; font-weight: 600; }
 .card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
 .stack { display: grid; gap: 14px; }
+.stack > * { min-width: 0; }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 button { font: inherit; font-weight: 600; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 10px 16px; cursor: pointer; }
 button.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
 button:disabled { opacity: .5; cursor: default; }
 button:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-select { font: inherit; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+select { max-width: 100%; font: inherit; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 .stat { background: var(--soft); border-radius: 10px; padding: 10px 12px; }
 .stat b { display: block; font-family: var(--font-display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
 .stat span { font-size: .85rem; color: var(--muted); }
@@ -80,6 +81,23 @@ textarea { width: 100%; min-height: 160px; font: inherit; padding: 10px; border-
 details.wrong { border-top: 1px solid var(--line); padding: 8px 0; }
 details.wrong summary { cursor: pointer; }
 .big { font-family: var(--font-display); font-size: 3rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--soft); border: 1px solid var(--line); border-radius: 12px; }
+.tabs button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 9px 12px; border-radius: 9px; text-align: center; }
+.tabs button small { display: block; font-weight: 400; font-size: .8rem; }
+.tabs button[aria-selected="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgb(0 0 0 / .14); }
+.tabs button[aria-selected="true"] small { color: var(--accent); }
+.part h2 { font-size: 1.1rem; margin: 4px 0 10px; }
+.chapters { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.chap { text-align: left; font-weight: 400; display: grid; gap: 3px; align-content: start; padding: 12px 14px; }
+.chap b { font-family: var(--font-display); font-size: 1.05rem; line-height: 1.25; }
+.chap .muted { font-size: .85rem; }
+.chap:hover { border-color: var(--accent); }
+.cbar { display: block; height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; margin-top: 5px; }
+.cbar i { display: block; height: 100%; }
+/* the book tab uses its own accent, so it is clear which section you are in */
+.wrap[data-tab="book"] { --accent: #b4532a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .wrap[data-tab="book"] { --accent: #f0a274; } }
+:root[data-theme="dark"] .wrap[data-tab="book"] { --accent: #f0a274; }
 @media (max-width: 520px) { .trow { grid-template-columns: minmax(0, 1fr) 54px; } .trow .tbar { grid-column: 1 / -1; grid-row: 2; } }
 @media (prefers-reduced-motion: reduce) { .prog i { transition: none; } }
 </style>
@@ -88,6 +106,7 @@ details.wrong summary { cursor: pointer; }
 <body>
 <div class="wrap" id="app"></div>
 <script src="questions.js"></script>
+<script src="book.js"></script>
 <script>
 const TOPICS = {
   intro: "Introduzione a Scrum", princ: "Principi agili", framework: "Framework e ruoli", sprints: "Sprint e DoD",
@@ -95,12 +114,20 @@ const TOPICS = {
   plan: "Livelli di pianificazione", splan: "Sprint planning", sexec: "Sprint execution", review: "Sprint review",
   retro: "Retrospective", cicd: "Lab 1: CI/CD", test: "Lab 2: Testing",
 };
+const HAS_BOOK = typeof BOOK_MC !== "undefined";
+const LABELS = { ...TOPICS, ...(HAS_BOOK ? BOOK_TOPICS : {}) };
 const hash = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
-const mcBank = [...MC.map(([t, q, o, e]) => ({ id: "m" + hash(q), t, q, o, e, nOk: 1 })),
-  ...(typeof MULTI === "undefined" ? [] : MULTI).map(([t, q, ok, ko, e]) => ({ id: "m" + hash(q), t, q, o: [...ok, ...ko], e, nOk: ok.length, multi: true }))];
+const toMc = pre => ([t, q, o, e]) => ({ id: pre + hash(q), t, q, o, e, nOk: 1 });
+const toMulti = pre => ([t, q, ok, ko, e]) => ({ id: pre + hash(q), t, q, o: [...ok, ...ko], e, nOk: ok.length, multi: true });
+const toOpen = pre => ([t, q, p]) => ({ id: pre + hash(q), t, q, p });
+// exam pool (slides and labs)
+const mcBank = [...MC.map(toMc("m")), ...(typeof MULTI === "undefined" ? [] : MULTI).map(toMulti("m"))];
 const nMulti = mcBank.filter(q => q.multi).length;
-const openBank = OPEN.map(([t, q, p]) => ({ id: "o" + hash(q), t, q, p }));
-const byId = Object.fromEntries([...mcBank, ...openBank].map(x => [x.id, x]));
+const openBank = OPEN.map(toOpen("o"));
+// separate pool: Rubin's book, chapter by chapter
+const bookMc = HAS_BOOK ? [...BOOK_MC.map(toMc("bm")), ...BOOK_MULTI.map(toMulti("bm"))] : [];
+const bookOpen = HAS_BOOK ? BOOK_OPEN.map(toOpen("bo")) : [];
+const byId = Object.fromEntries([...mcBank, ...openBank, ...bookMc, ...bookOpen].map(x => [x.id, x]));
 
 // per-viewer memory: how many times each question was shown, and the last wrong answers
 const store = {
@@ -133,13 +160,69 @@ const app = document.getElementById("app");
 let S = null; // session
 let tick = null;
 
+// two tabs on the same page: the exam simulator (slides and labs) and the book, each with its own errors and history
+const isBook = id => id.startsWith("b"); // course ids start with m/o, book ids with bm/bo
+const PARTS = [
+  ["Introduzione", ["b01"]], ["Parte I · Core Concepts", ["b02", "b03", "b04", "b05", "b06", "b07", "b08"]],
+  ["Parte II · Roles", ["b09", "b10", "b11", "b12", "b13"]], ["Parte III · Planning", ["b14", "b15", "b16", "b17", "b18"]],
+  ["Parte IV · Sprinting", ["b19", "b20", "b21", "b22"]], ["Conclusione", ["b23"]],
+];
+let chapterStats = store.get("asdq-chapters", {}); // last result of each book chapter
+let tab = (() => {
+  if (!HAS_BOOK) return "exam";
+  if (location.hash === "#libro") return "book";
+  if (location.hash === "#esame") return "exam";
+  return store.get("asdq-tab", "exam") === "book" ? "book" : "exam";
+})();
+const tabWrong = () => wrongIds.filter(id => byId[id] && isBook(id) === (tab === "book"));
+const tabHistory = () => history.filter(h => !!h.book === (tab === "book"));
+const col = v => v >= .8 ? "var(--ok)" : v >= .6 ? "var(--warn)" : "var(--ko)";
+
+function setTab(t) {
+  tab = t; store.set("asdq-tab", tab);
+  try { window.history.replaceState(null, "", "#" + (tab === "book" ? "libro" : "esame")); } catch (e) {}
+  startScreen();
+}
+function tabsHtml() {
+  if (!HAS_BOOK) return "";
+  const b = (t, name, sub) => `<button role="tab" aria-selected="${tab === t}" data-tab="${t}">${name}<small>${sub}</small></button>`;
+  return `<nav class="tabs" role="tablist" aria-label="Sezioni">${b("exam", "Esame", "slide e laboratori")}${b("book", "Libro", "Essential Scrum, per capitolo")}</nav>`;
+}
+function lastRuns() {
+  const last = tabHistory().slice(-3).reverse();
+  return last.length ? `<div class="card"><h2>${tab === "book" ? "Ultime sessioni sul libro" : "Ultime simulazioni"}</h2>${last.map(h => `<div class="row" style="justify-content:space-between"><span>${h.date} · ${h.label}</span><b>${h.mc}${h.open != null ? ` · aperte ${h.open}` : ""}</b></div>`).join("")}</div>` : "";
+}
+function resetButton(label) {
+  return `<button id="reset">${label}</button>`;
+}
+function bindCommon() {
+  app.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => { if (b.dataset.tab !== tab) setTab(b.dataset.tab); }));
+  document.getElementById("reset").addEventListener("click", e => {
+    if (!e.target.dataset.sure) { e.target.dataset.sure = "1"; e.target.textContent = "Clicca di nuovo per confermare"; return; }
+    const mine = id => isBook(id) === (tab === "book");
+    for (const id of Object.keys(seen)) if (mine(id)) delete seen[id];
+    wrongIds = wrongIds.filter(id => !mine(id));
+    history = history.filter(h => !!h.book !== (tab === "book"));
+    if (tab === "book") chapterStats = {};
+    store.set("asdq-seen", seen); store.set("asdq-wrong", wrongIds); store.set("asdq-history", history); store.set("asdq-chapters", chapterStats);
+    startScreen();
+  });
+}
+
 function startScreen() {
   clearInterval(tick);
+  app.dataset.tab = tab;
+  if (tab === "book") bookScreen(); else examScreen();
+  bindCommon();
+}
+
+function examScreen() {
   const unseenMc = mcBank.filter(q => !seen[q.id]).length;
   const unseenOpen = openBank.filter(q => !seen[q.id]).length;
-  const last = history.slice(-3).reverse();
+  const nWrong = tabWrong().length;
   app.innerHTML = `
   <div class="stack">
+    ${tabsHtml()}
     <div>
       <div class="tag">Agile Software Development · test intermedio</div>
       <h1>Simulatore d'esame</h1>
@@ -151,7 +234,7 @@ function startScreen() {
         <div class="stat"><b>${mcBank.length}</b><span>domande chiuse, di cui ${nMulti} con più risposte giuste</span></div>
         <div class="stat"><b>${openBank.length}</b><span>domande aperte</span></div>
         <div class="stat"><b>${unseenMc} + ${unseenOpen}</b><span>ancora mai viste</span></div>
-        <div class="stat"><b>${wrongIds.length}</b><span>errori da ripassare</span></div>
+        <div class="stat"><b>${nWrong}</b><span>errori da ripassare</span></div>
       </div>
       <div class="row">
         <label for="mode">Formato</label>
@@ -168,21 +251,58 @@ function startScreen() {
       </div>
       <div class="row">
         <button class="primary" id="go">Inizia</button>
-        <button id="redo" ${wrongIds.length ? "" : "disabled"}>Ripassa i ${wrongIds.length} errori</button>
-        <button id="reset">Azzera lo storico</button>
+        <button id="redo" ${nWrong ? "" : "disabled"}>Ripassa i ${nWrong} errori</button>
+        ${resetButton("Azzera lo storico")}
       </div>
       <p class="muted" style="margin:0;font-size:.9rem">Le risposte multiple sono corrette subito. Per le aperte scrivi la risposta, poi confrontala con i punti chiave e spunta quelli che hai toccato. Nelle domande «choose two/three» seleziona tutte le risposte e premi Conferma: valgono solo se sono tutte giuste. Tasti numerici per rispondere, Invio per confermare e andare avanti.</p>
     </div>
-    ${last.length ? `<div class="card"><h2>Ultime simulazioni</h2>${last.map(h => `<div class="row" style="justify-content:space-between"><span>${h.date} · ${h.label}</span><b>${h.mc}${h.open != null ? ` · aperte ${h.open}` : ""}</b></div>`).join("")}</div>` : ""}
+    ${lastRuns()}
   </div>`;
   const mode = document.getElementById("mode"), topic = document.getElementById("topic");
   mode.addEventListener("change", () => { topic.hidden = mode.value !== "topic"; });
   document.getElementById("go").addEventListener("click", () => begin(mode.value, topic.value));
   document.getElementById("redo").addEventListener("click", () => begin("wrong"));
-  document.getElementById("reset").addEventListener("click", e => {
-    if (e.target.dataset.sure) { seen = {}; wrongIds = []; history = []; store.set("asdq-seen", seen); store.set("asdq-wrong", wrongIds); store.set("asdq-history", history); startScreen(); }
-    else { e.target.dataset.sure = "1"; e.target.textContent = "Clicca di nuovo per confermare"; }
-  });
+}
+
+function bookScreen() {
+  const nWrong = tabWrong().length;
+  const unseen = [...bookMc, ...bookOpen].filter(q => !seen[q.id]).length;
+  const count = t => bookMc.filter(q => q.t === t).length + bookOpen.filter(q => q.t === t).length;
+  const card = t => {
+    const [num, name] = BOOK_TOPICS[t].replace(/^Libro cap\. /, "").split(/: (.*)/);
+    const s = chapterStats[t];
+    return `<button class="chap" data-ch="${t}"><span class="tag">Capitolo ${num}</span><b>${esc(name)}</b>
+      <span class="muted">${count(t)} domande · ${s ? `ultima volta ${s.ok}/${s.tot}` : "da fare"}</span>
+      <span class="cbar"><i style="width:${s ? s.ok / s.tot * 100 : 0}%;background:${s ? col(s.ok / s.tot) : "transparent"}"></i></span></button>`;
+  };
+  app.innerHTML = `
+  <div class="stack">
+    ${tabsHtml()}
+    <div>
+      <div class="tag">Kenneth S. Rubin · Essential Scrum (Addison-Wesley, 2012)</div>
+      <h1>Domande sul libro</h1>
+      <p class="muted">Domande capitolo per capitolo sul libro di testo del corso, con le risposte secondo il libro. Sono separate dalle simulazioni d'esame, che seguono le slide: il libro va oltre (ruoli in dettaglio, manager, strutture dei team, portfolio, envisioning, release planning), quindi usale per approfondire. Errori e storico di questo tab sono separati da quelli dell'esame.</p>
+    </div>
+    <div class="card stack">
+      <div class="stats">
+        <div class="stat"><b>${bookMc.length}</b><span>domande chiuse, di cui ${bookMc.filter(q => q.multi).length} con più risposte giuste</span></div>
+        <div class="stat"><b>${bookOpen.length}</b><span>domande aperte</span></div>
+        <div class="stat"><b>${unseen}</b><span>ancora mai viste</span></div>
+        <div class="stat"><b>${nWrong}</b><span>errori da ripassare</span></div>
+      </div>
+      <div class="row">
+        <button class="primary" data-go="bookquiz">Mix di tutti i capitoli: 30 chiuse + 5 aperte</button>
+        <button data-go="bookall">Tutte le ${bookMc.length} chiuse</button>
+        <button data-go="bookopen">Tutte le ${bookOpen.length} aperte</button>
+        <button data-go="wrong" ${nWrong ? "" : "disabled"}>Ripassa i ${nWrong} errori</button>
+      </div>
+    </div>
+    ${PARTS.map(([name, chs]) => `<section class="part"><h2>${name}</h2><div class="chapters">${chs.map(card).join("")}</div></section>`).join("")}
+    ${lastRuns()}
+    <div class="row">${resetButton("Azzera lo storico del libro")}</div>
+  </div>`;
+  app.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => begin(b.dataset.go)));
+  app.querySelectorAll("[data-ch]").forEach(b => b.addEventListener("click", () => begin("bookch", b.dataset.ch)));
 }
 
 function begin(mode, topic) {
@@ -194,12 +314,16 @@ function begin(mode, topic) {
   if (mode === "openonly") { op = pick(openBank, 20); label = "Solo domande aperte"; }
   if (mode === "openall") { op = pick(openBank, openBank.length); label = "Tutte le domande aperte"; }
   if (mode === "topic") { mc = pick(mcBank.filter(q => q.t === topic), 999); op = pick(openBank.filter(q => q.t === topic), 999); label = TOPICS[topic]; }
-  if (mode === "wrong") { mc = shuffle(wrongIds.map(id => byId[id]).filter(Boolean)); label = "Ripasso errori"; }
+  if (mode === "bookquiz") { mc = pick(bookMc, 30); op = pick(bookOpen, 5); label = "Libro: mix di tutti i capitoli"; }
+  if (mode === "bookall") { mc = pick(bookMc, bookMc.length); label = "Libro: tutte le chiuse"; }
+  if (mode === "bookopen") { op = pick(bookOpen, bookOpen.length); label = "Libro: tutte le aperte"; }
+  if (mode === "bookch") { mc = pick(bookMc.filter(q => q.t === topic), 999); op = pick(bookOpen.filter(q => q.t === topic), 999); label = LABELS[topic]; }
+  if (mode === "wrong") { mc = shuffle(tabWrong().map(id => byId[id])); label = tab === "book" ? "Libro: ripasso errori" : "Ripasso errori"; }
   if (!mc.length && !op.length) { startScreen(); return; }
   const items = [...mc.map(q => ({ kind: "mc", q, opts: shuffle(q.o.map((text, i) => ({ text, ok: i < q.nOk }))), sel: [] })), ...op.map(q => ({ kind: "open", q, text: "", checks: [], revealed: false }))];
   for (const it of items) seen[it.q.id] = (seen[it.q.id] || 0) + 1;
   store.set("asdq-seen", seen);
-  S = { items, i: 0, label, mode, end: minutes ? Date.now() + minutes * 60000 : null };
+  S = { items, i: 0, label, mode, topic, book: tab === "book", end: minutes ? Date.now() + minutes * 60000 : null };
   if (S.end) { tick = setInterval(updateTimer, 1000); }
   render();
 }
@@ -236,7 +360,7 @@ function render() {
     const answered = it.answer != null;
     const chosen = answered ? (Array.isArray(it.answer) ? it.answer : [it.answer]) : it.sel;
     const right = answered && isRight(it);
-    body = `<div class="card"><div class="tag">${TOPICS[it.q.t]} · ${it.q.multi ? `scegli ${it.q.nOk} risposte` : "risposta singola"}</div><div class="q">${esc(it.q.q)}</div>
+    body = `<div class="card"><div class="tag">${LABELS[it.q.t]} · ${it.q.multi ? `scegli ${it.q.nOk} risposte` : "risposta singola"}</div><div class="q">${esc(it.q.q)}</div>
       <div class="opts">${it.opts.map((o, k) => {
         let cls = "", note = "";
         const picked = chosen.includes(k);
@@ -254,7 +378,7 @@ function render() {
         : `<div class="fb ko"><strong>Sbagliato. ${it.q.multi ? "Le risposte giuste sono" : "La risposta giusta è"}: ${esc(rightText(it))}</strong>${esc(it.q.e)}</div>`) : ""}
       </div>`;
   } else {
-    body = `<div class="card stack"><div><div class="tag">${TOPICS[it.q.t]} · domanda aperta</div><div class="q">${esc(it.q.q)}</div></div>
+    body = `<div class="card stack"><div><div class="tag">${LABELS[it.q.t]} · domanda aperta</div><div class="q">${esc(it.q.q)}</div></div>
       <textarea id="ans" placeholder="Scrivi la tua risposta come all'esame…">${esc(it.text)}</textarea>
       ${it.revealed ? `<div><b>Punti chiave di una risposta completa.</b> <span class="muted">Spunta quelli che hai toccato.</span>
         <ul class="points">${it.q.p.map((p, k) => `<li><label><input type="checkbox" data-c="${k}" ${it.checks[k] ? "checked" : ""}> <span>${esc(p)}</span></label></li>`).join("")}</ul></div>`
@@ -311,24 +435,24 @@ function finish(timeout) {
   for (const x of mcs) { const p = (per[x.q.t] ||= { ok: 0, tot: 0 }); p.tot++; if (isRight(x)) p.ok++; }
   const wrong = mcs.filter(x => !isRight(x));
   const pct = mcs.length ? Math.round(ok / mcs.length * 100) : 0;
-  history.push({ date: new Date().toLocaleDateString("it-IT"), label: S.label, mc: mcs.length ? `${ok}/${mcs.length}` : "-", open: ops.length ? `${openScore.toFixed(1)}/${ops.length}` : null });
+  history.push({ date: new Date().toLocaleDateString("it-IT"), label: S.label, mc: mcs.length ? `${ok}/${mcs.length}` : "-", open: ops.length ? `${openScore.toFixed(1)}/${ops.length}` : null, ...(S.book ? { book: true } : {}) });
+  if (S.book) { for (const [t, p] of Object.entries(per)) chapterStats[t] = p; store.set("asdq-chapters", chapterStats); }
   store.set("asdq-history", history.slice(-30));
-  const col = v => v >= .8 ? "var(--ok)" : v >= .6 ? "var(--warn)" : "var(--ko)";
   app.innerHTML = `<div class="stack">
     <div><div class="tag">${S.label}${timeout ? " · tempo scaduto" : ""}</div><h1>Risultato</h1></div>
     <div class="card stats">
       ${mcs.length ? `<div class="stat"><b class="big" style="color:${col(ok / mcs.length)}">${pct}%</b><span>${ok} giuste su ${mcs.length} a risposta multipla</span></div>` : ""}
       ${ops.length ? `<div class="stat"><b class="big">${openScore.toFixed(1)}</b><span>punti su ${ops.length} nelle aperte (autovalutazione, ${openDone} corrette)</span></div>` : ""}
-      <div class="stat"><b class="big">${wrong.length}</b><span>errori o non risposte, salvati per il ripasso</span></div>
+      <div class="stat"><b class="big">${wrong.length}</b><span>errori o non risposte (gli errori restano da ripassare)</span></div>
     </div>
     ${mcs.length ? `<div class="card"><h2>Per argomento</h2><div class="topics">${Object.entries(per).sort((a, b) => a[1].ok / a[1].tot - b[1].ok / b[1].tot).map(([t, p]) =>
-      `<div class="trow"><span>${TOPICS[t]}</span><div class="tbar"><i style="width:${p.ok / p.tot * 100}%;background:${col(p.ok / p.tot)}"></i></div><b>${p.ok}/${p.tot}</b></div>`).join("")}</div>
-      <p class="muted" style="margin-bottom:0">In alto gli argomenti più deboli: ripassali sul riassunto o con la modalità «un solo argomento».</p></div>` : ""}
+      `<div class="trow"><span>${LABELS[t]}</span><div class="tbar"><i style="width:${p.ok / p.tot * 100}%;background:${col(p.ok / p.tot)}"></i></div><b>${p.ok}/${p.tot}</b></div>`).join("")}</div>
+      <p class="muted" style="margin-bottom:0">${S.book ? "In alto i capitoli più deboli: rileggili e rifalli dalla griglia del tab Libro." : "In alto gli argomenti più deboli: ripassali sul riassunto o con la modalità «un solo argomento»."}</p></div>` : ""}
     ${wrong.length ? `<div class="card"><h2>Le domande sbagliate</h2>${wrong.map(x => `<details class="wrong"><summary>${esc(x.q.q)}</summary>
       <p><b>${x.q.multi ? "Giuste" : "Giusta"}:</b> ${esc(rightText(x))}${x.answer != null ? `<br><span class="muted">Hai risposto: ${esc(chosenText(x))}</span>` : "<br><span class='muted'>Non risposta</span>"}</p><p>${esc(x.q.e)}</p></details>`).join("")}</div>` : ""}
     <div class="row"><button class="primary" id="again">Nuova simulazione</button><button id="home">Torna all'inizio</button></div>
   </div>`;
-  document.getElementById("again").addEventListener("click", () => begin(S.mode === "wrong" ? "wrong" : S.mode, S.items[0] && S.items[0].q.t));
+  document.getElementById("again").addEventListener("click", () => begin(S.mode, S.topic));
   document.getElementById("home").addEventListener("click", startScreen);
   window.scrollTo(0, 0);
 }

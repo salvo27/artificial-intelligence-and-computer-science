@@ -67,8 +67,15 @@ It is published on GitHub Pages and linked in the index under the PDF.
 
 - multiple choice: `[topic, question, [correct, wrong, wrong, wrong], explanation]`; the correct answer is **always the first**,
   the page shuffles the options;
+- multiple answers: `[topic, question, [correct answers], [wrong answers], explanation]`, with "(choose two)" or
+  "(choose three)" in the question;
 - open questions: `[topic, question, [key points of a complete answer]]`;
-- answers must follow **the course** (the lecturer's slides), and the explanation should say why the answer is right.
+- answers must follow **the course** (the lecturer's slides), and the explanation should say why the answer is right;
+- keep the options of a question equally detailed, so that the right one doesn't stand out by its length.
+
+A quiz can also have a `book.js` with questions on the course textbook, chapter by chapter (same formats, arrays
+`BOOK_MC`, `BOOK_MULTI`, `BOOK_OPEN` and the chapter names in `BOOK_TOPICS`). The page shows them in a separate "Libro" tab,
+with its own errors and history, and never mixes them into the exam simulations.
 
 To try it locally, open `quiz/index.html` in the browser. To add a quiz to another course, copy the `quiz/` folder,
 replace `questions.js` and the topic names at the top of the script in `index.html`, set `quiz: true` on the course

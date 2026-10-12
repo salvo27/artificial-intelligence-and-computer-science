@@ -12,7 +12,7 @@ Explanations and examples that are not in the slides are marked **Not in the sli
 enterprise applications and the Java notions are summarized at the end as supporting material.
 
 **Practice:** [exam simulator](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/)
-(multiple-choice and open questions with explanations) and [visual map of Scrum](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/map.html).
+(multiple-choice and open questions with explanations, plus a separate tab with questions on Rubin's book, chapter by chapter) and [visual map of Scrum](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/map.html).
 
 ## Contents
 
