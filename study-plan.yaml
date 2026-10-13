@@ -33,6 +33,8 @@ curricula:
 #   curricula     [cos], [das], [cos, das]; [] for free-choice courses
 #   modules       optional: each module gets its own subfolder
 #   status        todo | draft | done   (update it when you merge a PR)
+#   labs_pdf      optional: true puts the lab notes (labs.md) in a separate PDF, <slug>-labs.pdf,
+#                 instead of after the summaries in the course PDF
 #   contributors  GitHub usernames with the @ (rendered as links) or plain names
 #                 e.g. contributors: ["@mario-rossi", "@jdoe", "Anna Bianchi"]
 courses:
@@ -46,6 +48,7 @@ courses:
     curricula: [cos, das]
     status: draft
     contributors: []
+    labs_pdf: true   # lab notes in deep-learning-labs.pdf
 
   - slug: research-and-development-methodologies
     name: Research and Development Methodologies

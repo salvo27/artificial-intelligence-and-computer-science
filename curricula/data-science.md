@@ -8,7 +8,7 @@ Courses of the **Data Science** curriculum: 84 ECTS, plus 12 ECTS of free-choice
 
 | Year | Sem. | Course | ECTS | Status | PDF / Quiz | Contributors |
 |---|---|---|---|---|---|---|
-| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning.pdf) |  |
+| 1 | 1 | **[Deep Learning](../courses/deep-learning/)** | 9 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning.pdf)<br>[Labs PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning-labs.pdf) |  |
 | 1 | 1 | **[Research and Development Methodologies](../courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/research-and-development-methodologies.pdf)<br>[Quiz (Agile Software Development)](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/) |  |
 | 1 | 1 | **[Massively Parallel Programming on GPUs](../courses/massively-parallel-programming-on-gpus/)** | 6 | ⬜ To do |  |  |
 | 1 | 1 | **[Statistical Methods for Data Science](../courses/statistical-methods-for-data-science/)** | 6 | ⬜ To do |  |  |

@@ -13,7 +13,8 @@ Courses shared by both curricula appear only once.
 
 ## Course index
 
-Every course with some material has a **PDF** (summary and exercises) you can download from the index.
+Every course with some material has a **PDF** (summary and exercises) you can download from the index;
+Deep Learning also has a separate **Labs PDF** with the lab notes.
 The PDFs are regenerated automatically on every change. Some courses also have an interactive **quiz**
 (an exam simulator), published on [GitHub Pages](https://salvo27.github.io/artificial-intelligence-and-computer-science/)
 and linked under the PDF.
@@ -31,7 +32,7 @@ Legend: 🟢 common to both curricula · 🔒 Computer Security only · 📊 Dat
 
 | Course | ECTS | Curriculum | Status | PDF / Quiz | Contributors |
 |---|---|---|---|---|---|
-| **[Deep Learning](courses/deep-learning/)** | 9 | 🟢 Common | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning.pdf) |  |
+| **[Deep Learning](courses/deep-learning/)** | 9 | 🟢 Common | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning.pdf)<br>[Labs PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/deep-learning-labs.pdf) |  |
 | **[Research and Development Methodologies](courses/research-and-development-methodologies/)**<br><sub>Agile Software Development · Research Seminars in AI&CS</sub> | 9 | 🟢 Common | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/research-and-development-methodologies.pdf)<br>[Quiz (Agile Software Development)](https://salvo27.github.io/artificial-intelligence-and-computer-science/courses/research-and-development-methodologies/agile-software-development/quiz/) |  |
 | **[Cryptography](courses/cryptography/)** | 6 | 🔒 COS | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/cryptography.pdf) |  |
 | **[Secure Software Design](courses/secure-software-design/)** | 6 | 🔒 COS | 🟡 Draft | [PDF](https://github.com/salvo27/artificial-intelligence-and-computer-science/releases/download/pdf/secure-software-design.pdf) |  |

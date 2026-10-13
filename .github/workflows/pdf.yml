@@ -1,4 +1,4 @@
-# Builds one PDF per course (summary + exercises) and publishes them as assets
+# Builds the PDFs of each course (summary + exercises, plus the labs PDF where enabled) and publishes them as assets
 # of the "pdf" release, so they can be downloaded from the links in the index.
 name: PDF
 

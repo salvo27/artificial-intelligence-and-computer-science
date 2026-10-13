@@ -28,6 +28,8 @@ For courses split into modules (e.g. Intelligent Systems), each module has its o
 `courses/intelligent-systems/automated-planning/summary.md`.
 A module can also have **extra parts** in other Markdown files next to its summary (e.g. `agile-software-development/labs.md`
 for the lab lectures): link them from the summary. In the PDF they come after the summaries of all modules, in alphabetical order.
+A course with `labs_pdf: true` in `study-plan.yaml` (Deep Learning) publishes its `labs.md` in a separate PDF, `<course>-labs.pdf`,
+linked in the index next to the main one.
 
 ## How to write
 

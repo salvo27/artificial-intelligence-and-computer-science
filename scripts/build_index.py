@@ -22,6 +22,7 @@ STATUSES = {"todo": "⬜ To do", "draft": "🟡 Draft", "done": "✅ Done"}
 COMMON = "🟢 Common"
 ELECTIVE = "🎯 Elective"
 FREE_CHOICE_ECTS = 12
+LAB_NOTES = "labs.md"   # lab notes of a course or module: in a PDF of their own if the course has "labs_pdf: true"
 
 
 def fail(msg):
@@ -75,11 +76,26 @@ def status(c):
     return STATUSES[c["status"]]
 
 
-def pdf_link(c, plan):
-    """Link to the PDF published by the PDF workflow; only courses with some material have one."""
+def lab_notes(c):
+    """The lab notes (labs.md) of the course or of its modules, in module order, when the course publishes them
+    in a separate PDF ("labs_pdf: true"); otherwise none, and they stay in the course PDF as an extra part."""
+    if not c.get("labs_pdf"):
+        return []
+    base = ROOT / "courses" / c["slug"]
+    units = [base / m["slug"] for m in c["modules"]] if c["modules"] else [base]
+    return [u / LAB_NOTES for u in units if (u / LAB_NOTES).exists()]
+
+
+def pdf_links(c, plan):
+    """Links to the PDFs published by the PDF workflow: the lectures, plus the labs when they have a PDF of their own.
+    Only courses with some material have them."""
     if c["status"] == "todo":
-        return ""
-    return "[PDF](https://github.com/{}/releases/download/pdf/{}.pdf)".format(plan["repository"], c["slug"])
+        return []
+    url = "https://github.com/{}/releases/download/pdf/{}.pdf"
+    links = ["[PDF](" + url.format(plan["repository"], c["slug"]) + ")"]
+    if lab_notes(c):
+        links.append("[Labs PDF](" + url.format(plan["repository"], c["slug"] + "-labs") + ")")
+    return links
 
 
 def pages_url(plan):
@@ -100,8 +116,8 @@ def quizzes(c):
 
 
 def downloads(c, plan):
-    """PDF link, with the quiz links below it."""
-    links = [pdf_link(c, plan)] + ["[{}]({}{})".format(label, pages_url(plan), path) for label, path in quizzes(c)]
+    """PDF links, with the quiz links below them."""
+    links = pdf_links(c, plan) + ["[{}]({}{})".format(label, pages_url(plan), path) for label, path in quizzes(c)]
     return "<br>".join(x for x in links if x)
 
 
