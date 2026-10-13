@@ -8,6 +8,7 @@ Explanations and examples that are not in the slides are marked **Not in the sli
 *From the slides* are taken from the lecturer's material.
 
 **Progress:** all the material shared so far is covered (introduction and lessons 1 to 15). Nothing said in class beyond the slides is included yet.
+The laboratory has its own part: [lab notes](labs.md).
 
 ## Contents
 
