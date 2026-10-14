@@ -110,6 +110,22 @@ jupyter notebook --NotebookApp.allow_origin='https://colab.research.google.com' 
 Then, in Colab, *Connect → Connect to a local runtime* and paste the URL printed in the terminal. In the lab output TensorFlow 2.18.0 was installed
 with `!pip install tensorflow`.
 
+> [!TIP]
+> **Not in the labs: running the notebooks on Kaggle.** Kaggle notebooks are Jupyter notebooks like Colab, with a free GPU, but the Colab-specific
+> cells (`from google.colab import drive`, `files.upload()`) do not exist there and must be replaced:
+>
+> | On Colab | On Kaggle |
+> |---|---|
+> | `drive.mount(...)` or `files.upload()` | *Add Input*: attach a dataset; its files are under `/kaggle/input/<dataset>/`, **read-only** |
+> | `/content/`, writable, lost when the runtime resets | `/kaggle/working/`, writable (about 20 GB), kept only when you *Save Version* |
+> | *Runtime → Change runtime type → GPU* | *Settings → Accelerator → GPU* (T4 or P100) |
+> | internet always available | *Settings → Internet on* (needs a verified phone number): required for `pip install`, `curl`, `keras.datasets`, `tfds` |
+> | `%tensorboard` shows the dashboard in the notebook | usually it does not display: write the logs to `/kaggle/working/logs`, download them and run `tensorboard --logdir logs` locally |
+>
+> The CSV and text files of the labs (house prices, diabetes, toy dataset, Sherlock Holmes, UTKFace and its landmarks) can be uploaded once as a
+> private Kaggle dataset and attached to every notebook; MNIST, Fashion-MNIST, IMDb, Reuters and the TFDS datasets are downloaded by the code,
+> with internet on. `!ls /kaggle/input` shows the exact folder names to use in the paths.
+
 **Reproducibility.** The next word prediction notebook fixes all the seeds, so that two runs give the same numbers:
 
 ```python
@@ -1144,6 +1160,36 @@ Each batch is a pair: images `(32, 180, 180, 3)` and integer labels `(32,)`. The
 subsets complementary. The pixel values are in $[0, 255]$: a `Rescaling(1./255)` layer brings them to $[0, 1]$, either with
 `train_set.map(lambda x, y: (norm_layer(x), y))` or, better, as the first layer of the model.
 
+> [!TIP]
+> **Not in the labs: why `image_dataset_from_directory` and not a NumPy array with all the images.** An image dataset is **heavy**. On disk the photos
+> are compressed JPEGs, but to train on them they must be decoded: each $180 \times 180$ RGB image becomes $180 \cdot 180 \cdot 3 = 97{,}200$ numbers,
+> and Keras works in float32 (4 bytes per number). Loading everything in memory would take:
+>
+> | Dataset | Images | As float32 | As uint8 (1 byte per pixel value) |
+> |---|---|---|---|
+> | Flowers (L4.2) | 3670 | **1.4 GB** | 357 MB |
+> | Cats vs dogs (L4.4) | 23,410 | **9.1 GB** | 2.3 GB |
+> | UTKFace at 50×50 (L4.5) | 3404 | 102 MB | 26 MB |
+>
+> A free Colab machine has about 12 GB of RAM, shared with Python, TensorFlow and the model: cats vs dogs would not fit, and even the flowers would use a
+> good part of it. `image_dataset_from_directory` does not load the images, it **lists the files**, takes the labels from the folder names, and returns
+> a `tf.data.Dataset` that reads, decodes and resizes the images **one batch at a time**, while training. In memory there are only the batches being used
+> (and the few prepared in advance with `prefetch`, L8.6): a batch of 32 images of $180 \times 180 \times 3$ in float32 is about **12 MB**
+> (50 MB with the batch of 128 of L4.4), whatever the size of the dataset. The same code works with 3 thousand or 3 million images.
+>
+> What it does for us, besides saving memory:
+>
+> - **labels from the folder structure:** `roses/123.jpg` gets the label of `roses`, in alphabetical order of the folders (`class_names`);
+> - **resizing:** photos of different sizes (320×240, 500×333, ...) all become `image_size`, which a network with a fixed input needs;
+> - **splitting:** `validation_split` + `subset` + the same `seed` divide the list of files, without copying any image;
+> - **shuffling:** `shuffle=True` by default, so the batches do not contain only roses and then only tulips.
+>
+> The price is that the images are read and decoded again at every epoch. When the decoded dataset fits in memory, `.cache()` keeps it after the first
+> epoch, and `.prefetch(tf.data.AUTOTUNE)` lets the CPU prepare the next batch while the GPU trains on the current one (L8.6).
+> In L4.5, instead, UTKFace is loaded into a NumPy array with a loop: it is possible because the lab keeps only 3404 images and shrinks them to
+> $50 \times 50$. Note that `np.array(images) / 255.` gives **float64** (8 bytes per number), so even there the array takes 204 MB instead of 102:
+> `.astype('float32')` halves it.
+
 ```python
 model = Sequential()
 model.add(layers.Input(shape=(img_height, img_width, 3)))
@@ -1197,6 +1243,7 @@ overfitting on 2936 images.*
 | `strides` | default 1 | the window moves by 1 pixel |
 | `MaxPooling2D((2, 2))` | pool 2×2, stride 2 | halves width and height |
 | `image_size` | (180, 180) | every image is resized on loading |
+| `batch_size` (of the loader) | 32 | images read and decoded at a time: the only ones in memory |
 | `validation_split`, `subset`, `seed` | 0.2, training/validation, 42 | the split is done on the file list; same seed in both calls |
 | `SparseCategoricalCrossentropy()` | `from_logits=False` | integer labels; the output already has a softmax |
 
@@ -1271,7 +1318,17 @@ class_names[np.argmax(predictions)], 100 * np.max(predictions)  # 'sunflowers', 
 ## L4.4 Hands-on: cats versus dogs
 
 The notebook is the Keras example *Image classification from scratch* (François Chollet) with the model cells left empty. The data: the Kaggle
-Cats vs Dogs archive (786 MB), two folders `Cat` and `Dog`.
+Cats vs Dogs archive (786 MB), published by Microsoft (license CDLA-Permissive 2.0, the PDF is inside the zip). The notebook downloads it
+directly, there is nothing to upload:
+
+```python
+!curl -O https://download.microsoft.com/download/3/E/1/3E1C3F21-ECDB-4869-8368-6DEBA77B919F/kagglecatsanddogs_5340.zip
+!unzip -q kagglecatsanddogs_5340.zip     # creates PetImages/Cat and PetImages/Dog
+!ls PetImages                            # Cat  Dog
+```
+
+On Colab the download takes a few seconds (the lab output shows about 180 MB/s); the files live in the session's disk and disappear when the runtime
+is reset, so the cell must be run again in a new session. On your own machine, run the same two commands in a terminal without the `!`.
 
 ```python
 # remove corrupted files: a valid JPEG has the string "JFIF" in its first bytes
@@ -1285,9 +1342,76 @@ for folder_name in ("Cat", "Dog"):
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     "PetImages", validation_split=0.2, subset="training", seed=1337,
-    image_size=(180, 180), batch_size=128)          # 23,410 files: 18,728 training, 4,682 validation
+    image_size=(180, 180), batch_size=128)          # 23,410 files: 18,728 training
+val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+    "PetImages", validation_split=0.2, subset="validation", seed=1337,
+    image_size=(180, 180), batch_size=128)          # 4,682 validation: same seed, complementary subset
 ```
 
+The cleaning must run **before** creating the datasets: a corrupted file is not detected when the files are listed, but when it is decoded, so it
+would stop the training in the middle of an epoch. Running the cleaning cell twice is harmless (the second time it deletes 0 files).
+In Keras 3 the same loader is also available as `keras.utils.image_dataset_from_directory`.
+
+> [!TIP]
+> **Not in the labs: running it on Kaggle.** A Kaggle dataset is attached to the notebook under `/kaggle/input/<dataset>/` and stays there across
+> sessions, so nothing is downloaded again. But `/kaggle/input` is **read-only**: `os.remove` fails. Two ways out:
+>
+> - clean the images **on your machine** (the same loop, run locally) and upload the clean `PetImages` folder as your own Kaggle dataset; then the
+>   notebook only needs `image_dataset_from_directory("/kaggle/input/<dataset>/PetImages", ...)`;
+> - or, using a copy already on Kaggle, copy only the valid files to the writable folder `/kaggle/working`:
+>
+> The `JFIF` test alone is not enough: `fobj.peek(10)` returns the whole buffered block (usually thousands of bytes, not 10), so a broken file
+> that contains `JFIF` somewhere in it passes, and training stops later with *"Unknown image file format"*. In practice (23,442 files copied) a few
+> of them got through. The safe test is to decode each file with the same decoder the loader uses. Writing back the decoded image as a fresh JPEG
+> (instead of copying the original bytes) also repairs the slightly damaged files, so the *"Corrupt JPEG data"* warnings never appear during training.
+> A marker file makes the cell cheap to run again: it does the work only once per session, and redoes it from scratch if it was interrupted.
+>
+> ```python
+> import shutil
+> from tqdm import tqdm
+> src, dst = "/kaggle/input/<dataset>/PetImages", "/kaggle/working/PetImages"
+> marker = "/kaggle/working/.petimages_ready"           # outside dst, so the loader does not see it
+>
+> if os.path.exists(marker):
+>     print("Already prepared:", {f: len(os.listdir(os.path.join(dst, f))) for f in ("Cat", "Dog")})
+> else:
+>     shutil.rmtree(dst, ignore_errors=True)             # remove a half-done copy, if any
+>     bad = []
+>     for folder_name in ("Cat", "Dog"):
+>         os.makedirs(os.path.join(dst, folder_name), exist_ok=True)
+>         for fname in tqdm(os.listdir(os.path.join(src, folder_name)), desc=folder_name):
+>             fpath = os.path.join(src, folder_name, fname)
+>             try:
+>                 img = tf.io.decode_image(tf.io.read_file(fpath), channels=3, expand_animations=False)
+>                 tf.io.write_file(os.path.join(dst, folder_name, fname), tf.io.encode_jpeg(img, quality=95))
+>             except Exception:                          # not decodable: skipped
+>                 bad.append(fpath)
+>     open(marker, "w").close()
+>     print(len(bad), "files skipped")
+> ```
+>
+> Then, in a **separate cell**, the loaders (they read the cleaned copy):
+>
+> ```python
+> train_ds = keras.utils.image_dataset_from_directory(dst, validation_split=0.2, subset="training", seed=1337,
+>                                                     image_size=(180, 180), batch_size=128)
+> val_ds = keras.utils.image_dataset_from_directory(dst, validation_split=0.2, subset="validation", seed=1337,
+>                                                   image_size=(180, 180), batch_size=128)
+> ```
+>
+> The first run takes a few minutes (during it the *"Corrupt JPEG data: ... extraneous bytes"* warnings show up one last time: they come from the
+> JPEG library, not from Python, so `warnings` cannot silence them). To force a rebuild, delete the marker (`os.remove(marker)`). `shutil.rmtree`
+> deletes everything inside `dst` without asking: never point it at the whole `/kaggle/working`, where the saved model lives.
+> `model.fit(..., verbose=2)` prints one line per epoch instead of the progress bar.
+>
+> The copy is lost when the session ends. To do it only once: *Save Version* of this notebook, then attach its **output** as an input of the
+> other notebooks (*Add Input → Notebook Output*). Save the trained model in `/kaggle/working` too (`model.save('/kaggle/working/catsdogs.keras')`),
+> or it will be lost with the session.
+>
+> On Colab the equivalent is to keep the zip on Google Drive and, at each session, copy it to the local disk and unzip it there: unzipping 25,000
+> small files directly on Drive is very slow.
+
+Here reading from disk is not optional: decoded at $180 \times 180$, the 23,410 photos would take 9.1 GB in float32 (see the box in L4.2).
 Labels: 0 = cat, 1 = dog (alphabetical order of the folders). The steps to complete: augmentation, standardization with `Rescaling`, a model with a
 `Dropout` before the last layer, training (connected to TensorBoard, see Lab 9), inference. The notebook says that the full model gets over 90%
 validation accuracy after 25 epochs.
